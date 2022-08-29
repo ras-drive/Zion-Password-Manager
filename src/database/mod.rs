@@ -62,12 +62,12 @@ mod tests {
     fn test_db() {
         let connection = &mut establish_connection();
 
-        let mut test_id = i32::MAX;
-        let mut test_email = String::from("example@domain.com");
-        let mut test_password_hash = String::from("example_hash");
+        let test_id = i32::MAX;
+        let test_email = String::from("example@domain.com");
+        let test_password_hash = String::from("example_hash");
         let target = test_id;
 
-        let login = create_login(connection, test_id,
+        create_login(connection, test_id,
                                  test_email.as_str(),
                                  test_password_hash.as_str())
             .expect("error while creating login");
