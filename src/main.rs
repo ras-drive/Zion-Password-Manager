@@ -7,9 +7,23 @@ pub mod database;
 pub mod schema;
 
 #[get("/")]
-async fn index(hb: web::Data<Handlebars<'_>>) -> impl Responder {
+async fn index_handler(hb: web::Data<Handlebars<'_>>) -> impl Responder {
     let data = json!({});
     let body = hb.render("index", &data).unwrap();
+    HttpResponse::Ok().body(body)
+}
+
+#[get("/login")]
+async fn login_handler(hb: web::Data<Handlebars<'_>>) -> impl Responder {
+    let data = json!({});
+    let body = hb.render("login", &data).unwrap();
+    HttpResponse::Ok().body(body)
+}
+
+#[get("/register")]
+async fn register_handler(hb: web::Data<Handlebars<'_>>) -> impl Responder {
+    let data = json!({});
+    let body = hb.render("register", &data).unwrap();
     HttpResponse::Ok().body(body)
 }
 
@@ -33,7 +47,9 @@ async fn main() -> std::io::Result<()> {
                     .use_last_modified(true),
             )
             .route("/hello", web::get().to(|| async { "Hello World!" }))
-            .service(index)
+            .service(index_handler)
+            .service(login_handler)
+            .service(register_handler)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

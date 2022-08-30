@@ -1,14 +1,14 @@
 use diesel::prelude::*;
 use crate::schema::logins;
 
-#[derive(Queryable)]
+#[derive(Queryable, Debug, PartialEq)]
 pub struct Login {
     pub id: i32,
     pub email: String,
     pub password_hash: String,
 }
 
-#[derive(Insertable)]
+#[derive(Debug, Insertable)]
 #[diesel(table_name = logins)]
 pub struct NewLogin<'a> {
     pub id: i32,
