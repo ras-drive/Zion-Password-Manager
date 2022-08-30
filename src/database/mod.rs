@@ -77,3 +77,4 @@ mod tests {
         delete_login(connection, target).expect("error while deleting login");
     }
 }
+
