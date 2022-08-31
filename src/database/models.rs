@@ -1,7 +1,8 @@
 use diesel::prelude::*;
 use crate::schema::logins;
+use serde::{Serialize, Deserialize};
 
-#[derive(Queryable, Debug, PartialEq)]
+#[derive(Queryable, Debug, PartialEq, Serialize)]
 pub struct Login {
     pub id: i32,
     pub email: String,
