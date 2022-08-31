@@ -1,13 +1,11 @@
 extern crate bcrypt;
 
-use std::error::Error;
-use std::future::Future;
 use actix_files as fs;
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use actix_web::web::Path;
 use handlebars::Handlebars;
 use serde_json::json;
-use bcrypt::{BcryptResult, DEFAULT_COST, hash, verify};
+use bcrypt::{DEFAULT_COST, hash, verify};
 use crate::database::{check_database_for_id, create_login, establish_connection};
 
 pub mod database;
@@ -36,7 +34,7 @@ async fn register_page_handler(hb: web::Data<Handlebars<'_>>) -> impl Responder 
 
 #[get("/register/{email}/{password_hash}")]
 async fn register_handler_data<'a>(path: Path<(String, String)>) -> &'a str {
-    let data = json!({});
+    let _data = json!({});
     // let body = hb.render("register", &data).unwrap();
     let (email, unhashed_password) = path.into_inner();
     let hashed_password = hash(unhashed_password.as_str(), DEFAULT_COST)
@@ -47,19 +45,16 @@ async fn register_handler_data<'a>(path: Path<(String, String)>) -> &'a str {
             // println!("success");
             let mut id = -1;
             let connection = &mut establish_connection();
-            match check_database_for_id(connection).await {
-                Ok(data) => {
-                    id = data;
-                }
-                _ => {}
-            }
-
-            if id.gt(&-1){
-                create_login(connection, id, email.as_str(), hashed_password.as_str()).expect("error while creating login");
-            } else {
-                println!("no suitable id found")
-            }
+                if let Ok(data) = check_database_for_id(connection).await {
+                id = data;
         }
+
+        if id.gt(&-1){
+            create_login(connection, id, email.as_str(), hashed_password.as_str()).expect("error while creating login");
+        } else {
+            println!("no suitable id found")
+        }
+    }
         Err(e) => {
             println!("error while validating bcrypt hash for password!\n{}", e);
         }
