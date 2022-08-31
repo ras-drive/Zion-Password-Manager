@@ -3,7 +3,6 @@ use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;
 use std::error::Error;
-use diesel::dsl::{CountStar, Select};
 use super::schema;
 use self::models::{NewLogin, Login};
 
@@ -66,7 +65,7 @@ pub async fn check_database_for_id(
     return if results.is_empty() {
         Ok(0)
     } else {
-        Ok(results.get(results.len() - 1).expect("error getting last login").id + 1)
+        Ok(results.last().expect("error while getting new id").id + 1)
     }
 }
 
