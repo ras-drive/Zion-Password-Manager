@@ -49,13 +49,13 @@
 
             console.log(`${email} ${password}`)
             fetch( `/register/${email}/${password}` )
-                    .then( response => response.text().then() )
+                    .then( response => response.ok )
                     .then( response => {
                         // Do something with response.
-                        if (response === "OK") {
-                            console.log("DO SOMETHING TO SHOW YOU ARE REGISTERED")
+                        if (response === true) {
+                            console.log("YOU ARE NOW REGISTERED")
                         } else {
-                            console.log("ERROR VALUE, DO SOMETHING TO SHOW REGISTRATION FAILED")
+                            console.log("ERROR: REGISTRATION FAILED")
                         }
                     } );
         })

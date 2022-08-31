@@ -33,16 +33,13 @@ async fn register_page_handler(hb: web::Data<Handlebars<'_>>) -> impl Responder 
 }
 
 #[get("/register/{email}/{password_hash}")]
-async fn register_handler_data<'a>(path: Path<(String, String)>) -> &'a str {
-    let _data = json!({});
-    // let body = hb.render("register", &data).unwrap();
+async fn register_handler_data<'a>(path: Path<(String, String)>) -> impl Responder {
     let (email, unhashed_password) = path.into_inner();
     let hashed_password = hash(unhashed_password.as_str(), DEFAULT_COST)
         .expect("error while hashing password");
 
     match verify(unhashed_password.as_str(), hashed_password.as_str()) {
         Ok(_) => {
-            // println!("success");
             let mut id = -1;
             let connection = &mut establish_connection();
                 if let Ok(data) = check_database_for_id(connection).await {
@@ -52,16 +49,17 @@ async fn register_handler_data<'a>(path: Path<(String, String)>) -> &'a str {
         if id.gt(&-1){
             create_login(connection, id, email.as_str(), hashed_password.as_str()).expect("error while creating login");
         } else {
-            println!("no suitable id found")
+            println!("no suitable id found");
+            return HttpResponse::Forbidden()
         }
     }
         Err(e) => {
             println!("error while validating bcrypt hash for password!\n{}", e);
+            return HttpResponse::Forbidden()
         }
     }
 
-    "OK"
-    // HttpResponse::Ok().body(body)
+    HttpResponse::Ok()
 }
 
 #[actix_web::main] // or #[tokio::main]
