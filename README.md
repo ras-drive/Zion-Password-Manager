@@ -24,3 +24,10 @@ then
 ```shell
 cargo watch -x run
 ```
+
+## API
+
+| URI                          | Request type | desc                                    | example                                  |
+|------------------------------|--------------|-----------------------------------------|------------------------------------------|
+| /register/{email}/{password} | POST         | register an account with a unique email | /register/example@domain.com/password123 |
+
