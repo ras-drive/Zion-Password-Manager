@@ -24,14 +24,43 @@
 </nav>
 <div id="about">
     <h1>Register</h1>
-    <form>
+    <form id="form">
         <label for="email">Email:</label><br>
-        <input type="text" id="email" name="email"><br>
+        <input type="email" id="email" required name="email"><br>
         <label for="password">Password:</label><br>
-        <input type="text" id="password" name="password"><br>
+        <input type="password" id="password" required name="password"><br>
+        <input type="submit" value="Submit"/>
     </form>
-    <button>Submit</button>
     <a href="/login"><h2>Already have an account?</h2></a>
+    <script>
+        let form = document.getElementById("form")
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            let email
+            let password
+            const data = new FormData(form);
+            for (const [name,value] of data) {
+                if (name === "email") {
+                    email = value
+                } else if (name === "password") {
+                    password = value
+                }
+            }
+
+            console.log(`${email} ${password}`)
+            fetch( `/register/${email}/${password}` )
+                    .then( response => response.text().then() )
+                    .then( response => {
+                        // Do something with response.
+                        if (response === "OK") {
+                            console.log("DO SOMETHING TO SHOW YOU ARE REGISTERED")
+                        } else {
+                            console.log("ERROR VALUE, DO SOMETHING TO SHOW REGISTRATION FAILED")
+                        }
+                    } );
+        })
+
+    </script>
 </div>
 </body>
 </html>

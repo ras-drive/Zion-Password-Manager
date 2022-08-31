@@ -3,6 +3,7 @@ use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;
 use std::error::Error;
+use diesel::dsl::{CountStar, Select};
 use super::schema;
 use self::models::{NewLogin, Login};
 
@@ -54,9 +55,27 @@ pub fn delete_login(connection: &mut PgConnection, target: i32) -> Result<usize,
     Ok(num_deleted)
 }
 
+pub async fn check_database_for_id(
+    connection: &mut PgConnection) -> Result<i32, Box<dyn Error>> {
+    use self::schema::logins::dsl::*;
+
+    let results = logins
+        .load::<Login>(connection)
+        .expect("Error loading posts");
+
+    return if results.is_empty() {
+        Ok(0)
+    } else {
+        Ok(results.get(results.len() - 1).expect("error getting last login").id + 1)
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use crate::main;
     use super::*;
+    use super::super::register_handler_data;
+
 
     #[test]
     fn test_db() {
@@ -77,4 +96,3 @@ mod tests {
         delete_login(connection, target).expect("error while deleting login");
     }
 }
-
