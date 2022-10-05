@@ -1,18 +1,19 @@
-extern crate bcrypt;
+// extern crate actix_web;
 
+use std::error::Error;
 use actix_files as fs;
-use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use actix_web::web::Path;
+use actix_web::{post, get, web, App, HttpResponse, HttpServer, Responder};
 use handlebars::Handlebars;
 use serde_json::json;
-use bcrypt::{DEFAULT_COST, hash, verify};
-use crate::database::{check_database_for_id, create_login, establish_connection};
+use serde::{Deserialize, Serialize};
+
 
 pub mod database;
-pub mod schema;
+
+use crate::database::{test_db, User, validate_email_password};
 
 #[get("/")]
-async fn index_page_handler(hb: web::Data<Handlebars<'_>>) -> impl Responder {
+async fn index(hb: web::Data<Handlebars<'_>>) -> impl Responder {
     let data = json!({});
     let body = hb.render("index", &data).unwrap();
     HttpResponse::Ok().body(body)
@@ -32,45 +33,50 @@ async fn register_page_handler(hb: web::Data<Handlebars<'_>>) -> impl Responder 
     HttpResponse::Ok().body(body)
 }
 
-#[get("/register/{email}/{password_hash}")]
-async fn register_handler_data<'a>(path: Path<(String, String)>) -> impl Responder {
-    let (email, unhashed_password) = path.into_inner();
-    let hashed_password = hash(unhashed_password.as_str(), DEFAULT_COST)
-        .expect("error while hashing password");
+#[derive(Deserialize, Serialize)]
+struct RegisterUser {
+    email: String,
+    password: String,
+}
 
-    match verify(unhashed_password.as_str(), hashed_password.as_str()) {
+#[get("/register/{email}/{password}")]
+async fn register_user_handler(info: web::Path<(String, String)>) -> impl Responder {
+    let (email, password) = info.into_inner();
+    let user = User::new(email, password);
+    match user.insert_user_into_db().await {
         Ok(_) => {
-            let mut id = -1;
-            let connection = &mut establish_connection();
-                if let Ok(data) = check_database_for_id(connection).await {
-                id = data;
+            HttpResponse::Ok().finish()
         }
-
-        if id.gt(&-1){
-            create_login(connection, id, email.as_str(), hashed_password.as_str()).expect("error while creating login");
-        } else {
-            println!("no suitable id found");
-            return HttpResponse::Forbidden()
-        }
-    }
         Err(e) => {
-            println!("error while validating bcrypt hash for password!\n{}", e);
-            return HttpResponse::Forbidden()
+            println!("error: {}", e);
+            HttpResponse::BadRequest().finish()
         }
     }
+}
 
-    HttpResponse::Ok()
+#[get("/login/{email}/{password}")]
+async fn login_user_handler(info: web::Path<(String, String)>) -> impl Responder {
+    let (email, password) = info.into_inner();
+
+    return match validate_email_password(email, password).await {
+        Ok(_) => {
+            HttpResponse::Ok()
+        }
+        Err(_) => {
+            HttpResponse::Forbidden()
+        }
+    }
 }
 
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    // For handlebars template rendering
     let mut handlebars = Handlebars::new();
     handlebars
         .register_templates_directory(".hbs", "./static/html")
         .unwrap();
     let handlebars_ref = web::Data::new(handlebars);
 
+    // test_db().await;
 
     println!("listening on port 8080");
     HttpServer::new(move || {
@@ -82,12 +88,13 @@ async fn main() -> std::io::Result<()> {
                     .use_last_modified(true),
             )
             .route("/hello", web::get().to(|| async { "Hello World!" }))
-            .service(index_page_handler)
+            .service(index)
             .service(login_page_handler)
             .service(register_page_handler)
-            .service(register_handler_data)
+            .service(register_user_handler)
+            .service(login_user_handler)
     })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await
 }
