@@ -1,13 +1,12 @@
-use std::error::Error;
-use actix_web::{post, get, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use actix_files as fs;
 
-mod database;
+pub mod database;
 
-use crate::database::{test_db, User, validate_email_password};
+use crate::database::{User, validate_email_password};
 #[get("/")]
 async fn index(hb: web::Data<Handlebars<'_>>) -> impl Responder {
     let data = json!({});
@@ -54,8 +53,9 @@ async fn register_user_handler(info: web::Path<(String, String)>) -> impl Respon
 async fn login_user_handler(info: web::Path<(String, String)>) -> impl Responder {
     let (email, password) = info.into_inner();
 
-    return match validate_email_password(email, password).await {
+    match validate_email_password(email.clone(), password.clone()).await {
         Ok(_) => {
+            println!("user: {}: logged in", email);
             HttpResponse::Ok()
         }
         Err(_) => {

@@ -1,10 +1,10 @@
 use std::env;
-use bson::Document;
-use mongodb::{Client, Collection, IndexModel};
-use mongodb::options::{ClientOptions, FindOptions, IndexOptions, ResolverConfig};
-use chrono::{TimeZone, Utc};
-use mongodb::bson::{Bson, oid::ObjectId, doc};
+use mongodb::{Client, Collection};
+use mongodb::options::{ClientOptions, FindOptions, ResolverConfig};
+use mongodb::bson::{doc};
 use rand::Rng;
+
+pub mod passwords;
 
 
 const DB_NAME: &str = "users";
@@ -56,11 +56,7 @@ impl User {
 
     pub fn check_against_unhashed(&self, unhashed_password: String) -> bool {
         let new_hash = hash_with_salt(unhashed_password, self.salt.clone()).1;
-        if new_hash == self.password_hash {
-            true
-        } else {
-            false
-        }
+        new_hash == self.password_hash
     }
 }
 
@@ -82,8 +78,16 @@ pub async fn get_users_collection() -> Collection<User> {
     get_client().await.database(DB_NAME).collection(COLL)
 }
 
+///
+/// # get_salt
+/// Generates a salt with sha256 with a strlen of 32 using system
+/// entropy and other minor methods to generate a random string.
+///
+/// # Returns
+/// * `salt` - A sha256 salt.
+///
+///
 pub fn get_salt() -> String {
-    use rand::Rng;
     const STR_LEN: usize = 32;
     let mut rng = rand::thread_rng();
 
@@ -99,6 +103,17 @@ pub fn get_salt() -> String {
     String::from_utf8(chars).unwrap()
 }
 
+///
+/// # hash_with_salt
+/// Function is mostly run with the get_salt() to hash or
+/// a provided salt for unhashing a previously hashed password.
+///
+/// # Arguments
+/// * `unhashed_password` - The password being hashed.
+/// * `salt` - Salt to hash password.
+/// # Returns
+/// * `salt` - Salt supplied for hashing.
+/// * `hashed_password` - A sha256 hash with salt of the unhashed_password variable.
 pub fn hash_with_salt(unhashed_password: String, salt: String) -> (String, String) {
     let input = format!("{}{}", salt, unhashed_password);
     let hashed_password = digest(input);
@@ -106,18 +121,33 @@ pub fn hash_with_salt(unhashed_password: String, salt: String) -> (String, Strin
     (salt, hashed_password)
 }
 
+///
+/// # validate_email_password
+///
+/// # Arguments
+/// * 'email' - Login email
+/// * 'password' - password for login
+/// # Return
+/// Either a result containing a unit type or an error that
+/// needs to be handled from invalid passwords and such
+///
 pub async fn validate_email_password(email: String, password: String) -> Result<(), Box<dyn std::error::Error>> {
     let filter = doc! { "username": email.as_str() };
     let find_options = FindOptions::builder().sort(doc! { "username": 1 }).build();
     let mut cursor = get_users_collection().await.find(filter, find_options).await.unwrap();
 
-    while let Some(user) = cursor.next().await {
-        return if user.unwrap().check_against_unhashed(password.clone()) {
-            // TODO: possibly return login cookie
-            println!("user {} logged in", email.as_str());
-            Ok(())
-        } else {
-            Err("error, password or email invalid".into())
+    if let Some(user) = cursor.next().await {
+        return match user {
+            Ok(u) => {
+                if u.check_against_unhashed(password.clone()) {
+                    Ok(())
+                } else {
+                    Err("".into())
+                }
+            }
+            Err(_) => {
+                Err("email not found".into())
+            }
         }
     }
     Err("email not registered".into())
