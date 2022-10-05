@@ -25,7 +25,9 @@ then
 cargo watch -x run
 ```
 
-### Database Config
-create an exported variable with access to a MongoDB database called users.
-The database should have a collection titled Users, and it will populate when
-the app is run with the variable set.
+## API
+
+| URI                          | Request type | desc                                    | example                                  |
+|------------------------------|--------------|-----------------------------------------|------------------------------------------|
+| /register/{email}/{password} | POST         | register an account with a unique email | /register/example@domain.com/password123 |
+
