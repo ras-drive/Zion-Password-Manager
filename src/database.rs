@@ -122,4 +122,3 @@ pub async fn validate_email_password(email: String, password: String) -> Result<
     }
     Err("email not registered".into())
 }
-

@@ -1,18 +1,5 @@
-
 ## How to test it?
-### If you want to test the webserver with the database...
-
-start a postgresql server with
-```js
-// from .env: DATABASE_URL=postgres://postgres:password@localhost/postgres
-user = "postgres"
-password = "password"
-database_name = "postgres"
-host = "localhost"
-port = 5432
-```
-this will let Diesel connect to it
-
+If you want to test the webserver you can run
 ```shell
 cargo run 
 ```
@@ -25,9 +12,7 @@ then
 cargo watch -x run
 ```
 
-## API
-
-| URI                          | Request type | desc                                    | example                                  |
-|------------------------------|--------------|-----------------------------------------|------------------------------------------|
-| /register/{email}/{password} | POST         | register an account with a unique email | /register/example@domain.com/password123 |
-
+### Database Config
+create an exported variable with access to a MongoDB database called users.
+The database should have a collection titled Users, and it will populate when
+the app is run with the variable set.

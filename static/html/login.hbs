@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zion Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/public/static/css/main.css" type="text/css">
+</head>
+<body>
+<nav class="navbar">
+    <!-- LOGO -->
+    <div class="logo">
+        <a href="/"><img src="/public/static/images/zion-logo.png" alt="our logo" height="50" width="50"></a>
+    </div>
+    <!-- NAVIGATION MENU -->
+    <ul class="nav-links">
+        <!-- NAVIGATION MENUS -->
+        <div class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/login">Log In</a></li>
+            <li><a href="https://github.com/ras-drive/zion-password-manager">Code</a></li>
+        </div>
+    </ul>
+</nav>
+<div id="about">
+    <h1>Login</h1>
+    <form id="form">
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" required name="email"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" required name="password"><br>
+        <input type="submit" value="Submit"/>
+    </form>
+    <a href="/register"><h2>New Account</h2></a>
+    <script>
+        let form = document.getElementById("form")
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            let email
+            let password
+            const data = new FormData(form);
+            for (const [name, value] of data) {
+                if (name === "email") {
+                    email = value
+                } else if (name === "password") {
+                    password = value
+                }
+            }
+            // console.log(`${email} ${password}`)
+            let user = {
+                email: email,
+                password: password,
+            }
+            // console.log(user)
+            let response = await fetch(`/login/${email}/${password}`);
+            if (response.ok) { // if HTTP-status is 200-299
+                // get the response body (the method explained below)
+                console.log("user logged in")
+                window.location.href = "/";
+                // TODO: add support for login cookies
+                console.log(`user: ${email} logged in`)
+            } else {
+                alert("HTTP-Error: " + response.status)
+            }
+        })
+    </script>
+</div>
+</body>
+</html>
