@@ -1,5 +1,6 @@
 name: Rust
 
+
 on:
   push:
     branches: [ "main" ]
@@ -12,11 +13,12 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
+    - name: Rust Nightly
+      run: rustup override set nightly
     - name: Build
       run: cargo build --verbose
     - name: Run tests
