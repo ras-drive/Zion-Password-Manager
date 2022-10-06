@@ -159,10 +159,13 @@ mod tests {
     #[actix_web::test]
     async fn test_server_user_db() {
         let name = get_salt();
-        let srv = actix_test::start(|| App::new()
-            .service(register_user_handler));
+
+        let srv = actix_test::start(||
+            App::new().service(register_user_handler)
+        );
+
         let req = srv.get(format!("/register/{}/password", name));
-        let res = req.send().await.expect("error getting test response");// .unwrap();
+        let res = req.send().await.expect("error getting test response");
 
         assert!(res.status().is_success());
     }
