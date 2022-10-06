@@ -21,4 +21,4 @@ cargo test
 create an exported variable with access to a MongoDB database called users.
 The database should have a collection titled Users, and it will populate when
 the app is run with the variable set(it will look something like 
-"export MONGODB_URI=mongodb+srv://user:<password>@users.somedata.mongodb.net/").
+"export MONGODB_URI=mongodb+srv://user:password@users.somedata.mongodb.net/").
