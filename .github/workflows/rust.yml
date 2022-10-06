@@ -20,4 +20,4 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: Run tests
-      run: cargo test --verbose
+      run: travis_wait 3 cargo test --verbose
