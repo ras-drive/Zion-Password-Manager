@@ -154,12 +154,14 @@ pub async fn validate_email_password(
 mod tests {
     use crate::register_user_handler;
     use actix_web::App;
+    use crate::database::get_salt;
 
     #[actix_web::test]
     async fn test_server_user_db() {
-        let srv = actix_test::start(|| App::new().service(register_user_handler));
-
-        let req = srv.get("/register/test/password");
+        let name = get_salt();
+        let srv = actix_test::start(|| App::new()
+            .service(register_user_handler));
+        let req = srv.get(format!("/register/{}/password", name));
         let res = req.send().await.unwrap();
 
         assert!(res.status().is_success());
