@@ -1,26 +1,17 @@
-use std::env;
-use mongodb::{Client, Collection};
+use mongodb::bson::doc;
 use mongodb::options::{ClientOptions, FindOptions, ResolverConfig};
-use mongodb::bson::{doc};
+use mongodb::{Client, Collection};
 use rand::Rng;
+use std::env;
 
 pub mod passwords;
-
 
 const DB_NAME: &str = "users";
 const COLL: &str = "Users";
 
-pub async fn test_db() {
-    let name = get_salt();
-    let doc = User::new(name, "password".parse().unwrap());
-    doc.insert_user_into_db().await.unwrap();
-    println!("{}", doc.check_against_unhashed("password".to_string()));
-}
-
+use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sha256::digest;
-use futures::stream::{StreamExt, TryStreamExt};
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -42,15 +33,19 @@ impl User {
     pub async fn insert_user_into_db(&self) -> Result<(), Box<dyn std::error::Error>> {
         let filter = doc! { "username": self.username.as_str() };
         let find_options = FindOptions::builder().sort(doc! { "username": 1 }).build();
-        let mut cursor = get_users_collection().await.find(filter, find_options).await.unwrap();
+        let mut cursor = get_users_collection()
+            .await
+            .find(filter, find_options)
+            .await
+            .unwrap();
 
         while let Some(user) = cursor.next().await {
             if self.username == user.unwrap().username {
-                return Err("username already in database".into())
+                return Err("username already in database".into());
             }
         }
 
-        get_users_collection().await.insert_one(self, None).await.unwrap();
+        get_users_collection().await.insert_one(self, None).await?;
         Ok(())
     }
 
@@ -60,17 +55,14 @@ impl User {
     }
 }
 
-pub fn get_user_from_email(email: String) {
-
-}
-
 pub async fn get_client() -> Client {
     let client_uri =
         env::var("MONGODB_URI").expect("You must set the MONGODB_URI environment var!");
 
     let options =
         ClientOptions::parse_with_resolver_config(&client_uri, ResolverConfig::cloudflare())
-            .await.unwrap();
+            .await
+            .unwrap();
     Client::with_options(options).unwrap()
 }
 
@@ -131,10 +123,17 @@ pub fn hash_with_salt(unhashed_password: String, salt: String) -> (String, Strin
 /// Either a result containing a unit type or an error that
 /// needs to be handled from invalid passwords and such
 ///
-pub async fn validate_email_password(email: String, password: String) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn validate_email_password(
+    email: String,
+    password: String,
+) -> Result<(), Box<dyn std::error::Error>> {
     let filter = doc! { "username": email.as_str() };
     let find_options = FindOptions::builder().sort(doc! { "username": 1 }).build();
-    let mut cursor = get_users_collection().await.find(filter, find_options).await.unwrap();
+    let mut cursor = get_users_collection()
+        .await
+        .find(filter, find_options)
+        .await
+        .unwrap();
 
     if let Some(user) = cursor.next().await {
         return match user {
@@ -145,10 +144,24 @@ pub async fn validate_email_password(email: String, password: String) -> Result<
                     Err("".into())
                 }
             }
-            Err(_) => {
-                Err("email not found".into())
-            }
-        }
+            Err(_) => Err("email not found".into()),
+        };
     }
     Err("email not registered".into())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::register_user_handler;
+    use actix_web::App;
+
+    #[actix_web::test]
+    async fn test_server_user_db() {
+        let srv = actix_test::start(|| App::new().service(register_user_handler));
+
+        let req = srv.get("/register/test/password");
+        let res = req.send().await.unwrap();
+
+        assert!(res.status().is_success());
+    }
 }

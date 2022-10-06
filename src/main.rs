@@ -1,12 +1,14 @@
+extern crate core;
+
+use actix_files as fs;
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use actix_files as fs;
 
 pub mod database;
 
-use crate::database::{User, validate_email_password};
+use crate::database::{validate_email_password, User};
 #[get("/")]
 async fn index(hb: web::Data<Handlebars<'_>>) -> impl Responder {
     let data = json!({});
@@ -35,13 +37,11 @@ struct RegisterUser {
 }
 
 #[get("/register/{email}/{password}")]
-async fn register_user_handler(info: web::Path<(String, String)>) -> impl Responder {
+pub async fn register_user_handler(info: web::Path<(String, String)>) -> impl Responder {
     let (email, password) = info.into_inner();
     let user = User::new(email, password);
     match user.insert_user_into_db().await {
-        Ok(_) => {
-            HttpResponse::Ok().finish()
-        }
+        Ok(_) => HttpResponse::Ok().finish(),
         Err(e) => {
             println!("error: {}", e);
             HttpResponse::BadRequest().finish()
@@ -58,9 +58,7 @@ async fn login_user_handler(info: web::Path<(String, String)>) -> impl Responder
             println!("user: {}: logged in", email);
             HttpResponse::Ok()
         }
-        Err(_) => {
-            HttpResponse::Forbidden()
-        }
+        Err(_) => HttpResponse::Forbidden(),
     }
 }
 
@@ -90,7 +88,7 @@ async fn main() -> std::io::Result<()> {
             .service(register_user_handler)
             .service(login_user_handler)
     })
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }

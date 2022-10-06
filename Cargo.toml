@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 actix-web = { version = "4.1.0" , features = ["default"]}
 actix-files = "0.6.2"
+actix-test-server = "0.2.2"
 serde_json = "1.0.53"
 handlebars = { version = "4.1.4", features = ["dir_source"] }
 chrono = "0.4"
@@ -14,6 +15,7 @@ serde = { version = "1.0", features = ["derive"] }
 sha256 = "1.0.3"
 rand = "0.8.5"
 futures = "0.3.24"
+actix-test = "0.1.0-beta.13"
 
 [dependencies.mongodb]
 version = "2.3.1"
