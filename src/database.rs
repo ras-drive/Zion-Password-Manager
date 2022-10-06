@@ -162,7 +162,7 @@ mod tests {
         let srv = actix_test::start(|| App::new()
             .service(register_user_handler));
         let req = srv.get(format!("/register/{}/password", name));
-        let res = req.send().await.unwrap();
+        let res = req.send().await.expect("error getting test response");// .unwrap();
 
         assert!(res.status().is_success());
     }
