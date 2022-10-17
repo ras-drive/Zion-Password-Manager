@@ -20,6 +20,6 @@ jobs:
     - name: Rust Nightly
       run: rustup override set nightly
     - name: Build
-      run: cargo build --verbose
+      run: make build
     - name: Run tests
-      run: cargo test --verbose
+      run: make test
