@@ -158,7 +158,7 @@ mod tests {
 
     #[actix_web::test]
     async fn test_server_user_db() {
-        let name = get_salt();
+        let name = format!("{}@example.test", get_salt());
 
         let srv = actix_test::start(||
             App::new().service(register_user_handler)

@@ -66,7 +66,7 @@ async fn login_user_handler(info: web::Path<(String, String)>) -> impl Responder
 async fn main() -> std::io::Result<()> {
     let mut handlebars = Handlebars::new();
     handlebars
-        .register_templates_directory(".hbs", "./static/html")
+        .register_templates_directory(".hbs", "../static/html")
         .unwrap();
     let handlebars_ref = web::Data::new(handlebars);
 
@@ -77,7 +77,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(handlebars_ref.clone())
             .service(
-                fs::Files::new("/public", ".")
+                fs::Files::new("/public", "../")
                     .show_files_listing()
                     .use_last_modified(true),
             )
