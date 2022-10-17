@@ -1,17 +1,15 @@
-use mongodb::bson::doc;
-use mongodb::options::{ClientOptions, FindOptions, ResolverConfig};
-use mongodb::{Client, Collection};
 use rand::Rng;
-use std::env;
-
-pub mod passwords;
+use futures::StreamExt;
+use mongodb::bson::doc;
+use mongodb::Collection;
+use mongodb::options::FindOptions;
 
 const DB_NAME: &str = "users";
 const COLL: &str = "Users";
 
-use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sha256::digest;
+use crate::database::get_client;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -53,17 +51,6 @@ impl User {
         let new_hash = hash_with_salt(unhashed_password, self.salt.clone()).1;
         new_hash == self.password_hash
     }
-}
-
-pub async fn get_client() -> Client {
-    let client_uri =
-        env::var("MONGODB_URI").expect("You must set the MONGODB_URI environment var!");
-
-    let options =
-        ClientOptions::parse_with_resolver_config(&client_uri, ResolverConfig::cloudflare())
-            .await
-            .unwrap();
-    Client::with_options(options).unwrap()
 }
 
 pub async fn get_users_collection() -> Collection<User> {
@@ -152,9 +139,9 @@ pub async fn validate_email_password(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::register_user_handler;
     use actix_web::App;
-    use crate::database::get_salt;
 
     #[actix_web::test]
     async fn test_server_user_db() {

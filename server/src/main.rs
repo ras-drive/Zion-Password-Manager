@@ -8,7 +8,8 @@ use serde_json::json;
 
 pub mod database;
 
-use crate::database::{validate_email_password, User};
+use crate::database::{users::{validate_email_password, User}};
+
 #[get("/")]
 async fn index(hb: web::Data<Handlebars<'_>>) -> impl Responder {
     let data = json!({});
@@ -69,8 +70,6 @@ async fn main() -> std::io::Result<()> {
         .register_templates_directory(".hbs", "../static/html")
         .unwrap();
     let handlebars_ref = web::Data::new(handlebars);
-
-    // test_db().await;
 
     println!("listening on port 8080");
     HttpServer::new(move || {
