@@ -29,6 +29,12 @@ sudo systemctl start docker.service
 After you are sure the docker daemon is active you can run the following to make a build
 
 ```shell
+./build_and_run_docker.sh
+```
+
+or manually by running
+
+```shell
 sudo docker build .
 ```
 
