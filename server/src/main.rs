@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate dotenv_codegen;
+
 extern crate core;
 
 use actix_files as fs;
