@@ -71,7 +71,9 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
     let handlebars_ref = web::Data::new(handlebars);
 
+    println!("server starting...");
     println!("listening on port 8080");
+
     HttpServer::new(move || {
         App::new()
             .app_data(handlebars_ref.clone())
