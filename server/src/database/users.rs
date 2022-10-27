@@ -1,15 +1,7 @@
 use rand::Rng;
-use futures::StreamExt;
-use mongodb::bson::doc;
-use mongodb::Collection;
-use mongodb::options::FindOptions;
-
-const DB_NAME: &str = "users";
-const COLL: &str = "Users";
 
 use serde::{Deserialize, Serialize};
 use sha256::digest;
-use crate::database::get_client;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -28,34 +20,12 @@ impl User {
         }
     }
 
-    pub async fn insert_user_into_db(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let filter = doc! { "username": self.username.as_str() };
-        let find_options = FindOptions::builder().sort(doc! { "username": 1 }).build();
-        let mut cursor = get_users_collection()
-            .await
-            .find(filter, find_options)
-            .await
-            .unwrap();
-
-        while let Some(user) = cursor.next().await {
-            if self.username == user.unwrap().username {
-                return Err("username already in database".into());
-            }
-        }
-
-        get_users_collection().await.insert_one(self, None).await?;
-        Ok(())
-    }
-
     pub fn check_against_unhashed(&self, unhashed_password: String) -> bool {
         let new_hash = hash_with_salt(unhashed_password, self.salt.clone()).1;
         new_hash == self.password_hash
     }
 }
 
-pub async fn get_users_collection() -> Collection<User> {
-    get_client().await.database(DB_NAME).collection(COLL)
-}
 
 ///
 /// # get_salt
@@ -98,62 +68,4 @@ pub fn hash_with_salt(unhashed_password: String, salt: String) -> (String, Strin
     let hashed_password = digest(input);
 
     (salt, hashed_password)
-}
-
-///
-/// # validate_email_password
-///
-/// # Arguments
-/// * 'email' - Login email
-/// * 'password' - password for login
-/// # Return
-/// Either a result containing a unit type or an error that
-/// needs to be handled from invalid passwords and such
-///
-pub async fn validate_email_password(
-    email: String,
-    password: String,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let filter = doc! { "username": email.as_str() };
-    let find_options = FindOptions::builder().sort(doc! { "username": 1 }).build();
-    let mut cursor = get_users_collection()
-        .await
-        .find(filter, find_options)
-        .await
-        .unwrap();
-
-    if let Some(user) = cursor.next().await {
-        return match user {
-            Ok(u) => {
-                if u.check_against_unhashed(password.clone()) {
-                    Ok(())
-                } else {
-                    Err("".into())
-                }
-            }
-            Err(_) => Err("email not found".into()),
-        };
-    }
-    Err("email not registered".into())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::register_user_handler;
-    use actix_web::App;
-
-    #[actix_web::test]
-    async fn test_server_user_db() {
-        let name = format!("{}@example.test", get_salt());
-
-        let srv = actix_test::start(||
-            App::new().service(register_user_handler)
-        );
-
-        let req = srv.get(format!("/register/{}/password", name));
-        let res = req.send().await.expect("error getting test response");
-
-        assert!(res.status().is_success());
-    }
 }

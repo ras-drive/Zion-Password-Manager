@@ -11,8 +11,6 @@ use serde_json::json;
 
 pub mod database;
 
-use crate::database::{users::{validate_email_password, User}};
-
 #[get("/")]
 async fn index(hb: web::Data<Handlebars<'_>>) -> impl Responder {
     let data = json!({});
@@ -42,28 +40,12 @@ struct RegisterUser {
 
 #[get("/register/{email}/{password}")]
 pub async fn register_user_handler(info: web::Path<(String, String)>) -> impl Responder {
-    let (email, password) = info.into_inner();
-    let user = User::new(email, password);
-    match user.insert_user_into_db().await {
-        Ok(_) => HttpResponse::Ok().finish(),
-        Err(e) => {
-            println!("error: {}", e);
-            HttpResponse::BadRequest().finish()
-        }
-    }
+    HttpResponse::Ok()
 }
 
 #[get("/login/{email}/{password}")]
 async fn login_user_handler(info: web::Path<(String, String)>) -> impl Responder {
-    let (email, password) = info.into_inner();
-
-    match validate_email_password(email.clone(), password.clone()).await {
-        Ok(_) => {
-            println!("user: {}: logged in", email);
-            HttpResponse::Ok()
-        }
-        Err(_) => HttpResponse::Forbidden(),
-    }
+    HttpResponse::Ok()
 }
 
 #[actix_web::main] // or #[tokio::main]
@@ -92,7 +74,7 @@ async fn main() -> std::io::Result<()> {
             .service(register_user_handler)
             .service(login_user_handler)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }
