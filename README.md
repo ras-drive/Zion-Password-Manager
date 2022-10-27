@@ -40,9 +40,10 @@ sudo docker images
 
 The output should look like this
 
-REPOSITORY        TAG       IMAGE ID       CREATED          SIZE
-zion              0.1.0     cc0c5467c9f0   3 minutes ago    2.81GB
-ubuntu/postgres   latest    d185f4582c7b   7 days ago       393MB
+| REPOSITORY         | TAG     | IMAGE ID     | CREATED ID    | SIZE |
+|--------------------|---------|--------------|---------------|------|
+| zion               | 0.1.0   | cc0c5467c9f0 | 3 minutes ago | 2.81GB
+| ubuntu/postgres    |  latest | d185f4582c7b |  7 days ago   |  393MB
 
 Copy the image id of zion.
 
