@@ -15,9 +15,6 @@ WORKDIR /usr/src/app
 # clone project source "$HOME/.cargo/env"
 RUN git clone https://github.com/ras-drive/Zion-Password-Manager.git
 
-# TEMPORARY FOR THIS BRANCH ***PLEASE REMOVE AFTER THIS FILE IS PUSHED TO MAIN!***
-RUN ["/bin/bash", "-c", "cd Zion-Password-Manager/; git checkout db-rewrite; cd .."]
-
 RUN ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; make build"]
 
 EXPOSE 8080
