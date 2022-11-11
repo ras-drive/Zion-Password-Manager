@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build --mode development",
     "preview": "vite preview",
+    "clean": "rm -rf dist",
     "lint": "eslint --max-warnings=0"
   },
   "dependencies": {
@@ -18,9 +19,16 @@
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
     "@vitejs/plugin-react": "^2.2.0",
     "eslint": "^8.27.0",
-    "typescript": "^4.6.4",
+    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.5.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.31.10",
+    "typescript": "^4.8.4",
     "vite": "^3.2.3",
     "vite-plugin-eslint": "^1.8.1"
   }

@@ -18,5 +18,5 @@ test:
 	RUST_BACKTRACE=1 cargo test
 
 clean:
-	cd backend; \
-	cargo clean
+	cd backend; cargo clean; cd ..;\
+	cd frontend; npm run clean
