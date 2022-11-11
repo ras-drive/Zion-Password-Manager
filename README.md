@@ -1,4 +1,14 @@
-# How to test it?
+# CURRENTLY THIS PROJECT IS BEING REDONE
+
+in order to test the project right now just run
+
+```shell
+make configure
+make build
+make run
+```
+
+## How to test it?
 
 If you want to test the webserver you can run
 
