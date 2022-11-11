@@ -1,7 +1,7 @@
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 use tokio::io;
 
-use rocket::{routes, launch, get, fs::NamedFile, response::Redirect};
+use rocket::{fs::NamedFile, get, launch, response::Redirect, routes};
 
 #[get("/<file..>")]
 async fn build_dir(file: PathBuf) -> io::Result<NamedFile> {
