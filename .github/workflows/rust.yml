@@ -17,4 +17,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Docker Script
-      run: ./build_and_run_docker.sh
+      run: ./build_and_test_docker.sh
