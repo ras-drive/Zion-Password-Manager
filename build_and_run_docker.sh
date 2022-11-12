@@ -10,6 +10,6 @@ else
     fi
 fi
 
-sudo docker build -t zion:0.1.0 .
+docker build . -t zion:latest
 
-sudo docker run zion:0.1.0
+docker run -e localhost=host.docker.internal -p 8000:8000 --rm --name foo:latest -it foo:latest
