@@ -26,4 +26,4 @@ RUN ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; sour
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; make run"]
+ENTRYPOINT ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; make test"]
