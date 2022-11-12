@@ -12,4 +12,4 @@ fi
 
 docker build . -t zion
 
-docker run -e localhost=host.docker.internal -p 8000:8000 --rm --name zion -it zion
+docker run -e localhost=host.docker.internal -p 8000:8000 --rm --name zion zion
