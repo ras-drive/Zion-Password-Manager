@@ -9,7 +9,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  MONGODB_URI: mongodb+srv://user:oWeLEQtWAp6Pn596@users.phxlx2l.mongodb.net/
 
 jobs:
   build:
@@ -21,5 +20,5 @@ jobs:
       run: rustup override set nightly
     - name: Build
       run: make build
-    #- name: Run tests
-    #  run: make test
+    - name: Run tests
+      run: make test
