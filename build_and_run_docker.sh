@@ -10,6 +10,6 @@ else
     fi
 fi
 
-docker build . -t zion:latest
+docker build . -t zion
 
-docker run -e localhost=host.docker.internal -p 8000:8000 --rm --name foo:latest -it foo:latest
+docker run -e localhost=host.docker.internal -p 8000:8000 --rm --name zion -it zion
