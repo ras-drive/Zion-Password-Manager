@@ -20,7 +20,9 @@ WORKDIR /usr/src/app
 # clone project source "$HOME/.cargo/env"
 RUN git clone https://github.com/ras-drive/Zion-Password-Manager.git
 
-RUN ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make configure"]
+# RUN ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make configure"]
+
+RUN ["/bin/bash", "-c", "cd Zion-Password-Manager/frontend; npm i"]
 
 RUN ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make build"]
 

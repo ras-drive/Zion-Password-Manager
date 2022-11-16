@@ -1,7 +1,14 @@
+#![feature(decl_macro, proc_macro_hygiene)]
+
 use std::path::{Path, PathBuf};
+use database::establish_connection;
 use tokio::io;
 
+#[macro_use] extern crate dotenv_codegen;
+
 use rocket::{fs::NamedFile, get, launch, response::Redirect, routes};
+
+pub mod database;
 
 #[get("/<file..>")]
 async fn build_dir(file: PathBuf) -> io::Result<NamedFile> {
@@ -26,5 +33,8 @@ fn register() -> Redirect {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![build_dir, index, login, register])
+    establish_connection();
+    rocket::build()
+        // .manage()
+        .mount("/", routes![build_dir, index, login, register])
 }

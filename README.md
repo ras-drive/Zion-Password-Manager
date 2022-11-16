@@ -1,5 +1,14 @@
 # CURRENTLY THIS PROJECT IS BEING REDONE
 
+First things first, you need to setup a postgresql database
+
+Any of the links below explain how to setup a postgresql database so
+pick your distributions (if yours isn't listed I prefer the Arch Docs)
+
+* [Debian](https://wiki.debian.org/PostgreSql)
+* [Fedora](https://docs.fedoraproject.org/en-US/quick-docs/postgresql/)
+* [Arch](https://wiki.archlinux.org/title/PostgreSQL)
+
 in order to test the project right now just run
 
 ```shell
@@ -21,24 +30,4 @@ the provided docker shell script
 
 ```shell
 ./build_and_run_docker.sh
-```
-
-## How to test it?
-
-If you want to test the webserver you can run
-
-```shell
-make configure 
-```
-
-then
-
-```shell
-make dev
-```
-
-if you want to run the test module run
-
-```shell
-make test
 ```
