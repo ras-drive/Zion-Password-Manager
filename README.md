@@ -29,5 +29,5 @@ In order to build and run docker easily you can just run
 the provided docker shell script
 
 ```shell
-./build_and_run_docker.sh
+docker-compose up
 ```

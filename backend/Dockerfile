@@ -1,10 +1,10 @@
 # gets base image
-FROM ubuntu
+FROM ubuntu/postgres
 
 # get tools
 RUN apt-get update && \
     apt-get -y upgrade && \
-    apt-get -y install git curl g++ build-essential npm nodejs
+    apt-get -y install git curl g++ build-essential npm nodejs libpq-dev
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash 
 
@@ -22,10 +22,14 @@ RUN git clone https://github.com/ras-drive/Zion-Password-Manager.git
 
 # RUN ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make configure"]
 
-RUN ["/bin/bash", "-c", "cd Zion-Password-Manager/frontend; npm i"]
+WORKDIR /usr/src/app/Zion-Password-Manager
 
-RUN ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make build"]
+RUN ["/bin/bash", "-c", "cd frontend; npm i"]
+
+RUN cd Zion-Password-Manager; echo "DATABASE_URL=postgres://postgres:password@localHost:5432/zion" > ../.env
+
+RUN ["/bin/bash", "-c", "source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make build"]
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; make test"]
+ENTRYPOINT ["/bin/bash", "-c", "source $HOME/.cargo/env; make test"]

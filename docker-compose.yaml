@@ -1,0 +1,16 @@
+version: "3"
+services:
+  server:
+    build:
+      context: backend
+    depends_on:
+      - db
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: zion
