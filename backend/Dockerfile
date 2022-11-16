@@ -1,5 +1,5 @@
 # gets base image
-FROM ubuntu/postgres
+FROM ubuntu
 
 # get tools
 RUN apt-get update && \
