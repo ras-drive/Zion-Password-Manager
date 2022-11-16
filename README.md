@@ -1,6 +1,6 @@
 # CURRENTLY THIS PROJECT IS BEING REDONE
 
-First things first, you need to setup a postgresql database
+First things first, if you aren't using Dockeryou need to setup a postgresql database
 
 Any of the links below explain how to setup a postgresql database so
 pick your distributions (if yours isn't listed I prefer the Arch Docs)
@@ -25,8 +25,7 @@ To run with docker first check that the docker service has been started
 sudo systemctl start docker.service
 ```
 
-In order to build and run docker easily you can just run
-the provided docker shell script
+Then you can run it with Docker Compose
 
 ```shell
 docker-compose up
