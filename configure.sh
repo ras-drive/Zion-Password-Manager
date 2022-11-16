@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 
-cd frontend
+cd frontend || return
 npm i

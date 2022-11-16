@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ "$EUID" = 0 ]]; then
     echo "running as root"
 else

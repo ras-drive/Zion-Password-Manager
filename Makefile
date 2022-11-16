@@ -4,7 +4,7 @@ configure:
 build:
 	cd frontend; npm run build; \
 	cp public/* dist/assets/; cd ../; \
-	cd backend; cargo build --release
+	cd backend; cargo build
 
 run:
 	cd backend; \
