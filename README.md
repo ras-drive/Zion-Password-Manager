@@ -1,6 +1,12 @@
-# CURRENTLY THIS PROJECT IS BEING REDONE
+# What is Zion?
 
-First things first, if you aren't using Dockeryou need to setup a postgresql database
+Zion is a password manager being developed to be a modern, cross platform, and secure with a
+backend written in Rust. currently the only frontend being developed for use is a webpage but
+eventually an android version will be released when the backend is stable.
+
+## Testing the project
+
+First things first, if you aren't using Docker you need to setup a postgresql database
 
 Any of the links below explain how to setup a postgresql database so
 pick your distributions (if yours isn't listed I prefer the Arch Docs)
@@ -30,3 +36,7 @@ Then you can run it with Docker Compose
 ```shell
 docker-compose up
 ```
+
+### License
+
+This project is dual licensed under the MIT and Apache 2.0 license
