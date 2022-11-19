@@ -11,10 +11,11 @@ pub fn establish_connection() -> PgConnection {
 }
 
 #[cfg(test)]
-pub mod test {
+mod tests {
   use super::*;
 
-  pub fn test_connection() {
+  #[test]
+  fn test_connection() {
     establish_connection();
   }
 }
