@@ -15,21 +15,24 @@ RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 
 RUN ["/bin/bash", "-c", "source $HOME/.cargo/env; rustup override set nightly"]
 
+RUN ["/bin/bash", "-c", "source $HOME/.cargo/env; cargo install diesel_cli --no-default-features --features postgres"]
+
 WORKDIR /usr/src/app
 
-# clone project source "$HOME/.cargo/env"
+# clone project source
 RUN git clone https://github.com/ras-drive/Zion-Password-Manager.git
-
-# RUN ["/bin/bash", "-c", "cd Zion-Password-Manager; source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make configure"]
 
 WORKDIR /usr/src/app/Zion-Password-Manager
 
 RUN ["/bin/bash", "-c", "cd frontend; npm i"]
 
-RUN echo "DATABASE_URL=postgres://postgres:password@localHost:5432/zion" > .env
+RUN echo "DATABASE_URL=postgres://postgres:password@database:5432/zion" > .env
 
 RUN ["/bin/bash", "-c", "source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make build"]
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/bash", "-c", "source $HOME/.cargo/env; make test"]
+RUN echo "cd backend/migrations; source $HOME/.cargo/env; diesel migration run" > start.sh
+RUN chmod 777 start.sh
+
+ENTRYPOINT ["/bin/bash", "-c", "source $HOME/.cargo/env; ./start.sh; make test"]

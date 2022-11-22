@@ -1,16 +1,40 @@
 version: "3"
 services:
-  server:
-    build:
-      context: backend
-    depends_on:
-      - db
-  db:
+  database:
     image: postgres
     restart: always
+    expose:
+      - 5432
     ports:
-      - 5432:5432
+      - "5432:5432"
+    volumes:
+      - ./db-data/:/var/lib/postgresql/data/
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: zion
+      PGDATA: /var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "zion", "-U", "postgres"]
+      timeout: 25s
+      interval: 10s
+      retries: 5
+    networks:
+      - postgres-compose-network
+      
+  server:
+    build:
+      context: backend
+    expose:
+      - 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - postgres-compose-network
+ 
+networks:
+  postgres-compose-network:
+    driver: bridge

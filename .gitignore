@@ -4,3 +4,5 @@
 *.lock
 .env
 .vscode
+/db-data
+zion.session.sql
