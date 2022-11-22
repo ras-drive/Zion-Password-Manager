@@ -1,14 +1,16 @@
 #![feature(decl_macro, proc_macro_hygiene)]
 
-use std::path::{Path, PathBuf};
 use database::establish_connection;
+use std::path::{Path, PathBuf};
 use tokio::io;
 
-#[macro_use] extern crate dotenv_codegen;
+#[macro_use]
+extern crate dotenv_codegen;
 
 use rocket::{fs::NamedFile, get, launch, response::Redirect, routes};
 
 pub mod database;
+pub mod schema;
 
 #[get("/<file..>")]
 async fn build_dir(file: PathBuf) -> io::Result<NamedFile> {
