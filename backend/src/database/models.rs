@@ -61,7 +61,7 @@ impl User {
     ///
     pub async unsafe fn delete(&mut self, user_id: i32) -> io::Result<User> {
         if !cfg!(test) {
-            panic!("must be run as in a test case")
+            panic!("must be run in a test case")
         }
 
         let mut conn = establish_connection();
