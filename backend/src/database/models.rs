@@ -21,7 +21,6 @@ pub struct User {
     pub id: i32,
     pub email: String,
     pub password_hash: String,
-    pub salt: String,
 }
 
 impl User {
@@ -34,7 +33,6 @@ impl User {
             id: user_id,
             email: user_email,
             password_hash: password_string,
-            salt: String::from(""),
         }
     }
 
@@ -63,7 +61,6 @@ impl User {
             .expect("error while hashing password").to_string();
 
         self.password_hash = hashed_password;
-        self.password_hash.as_str().to_string();
 
         insert_into(users).values(self.clone()).execute(&mut conn)?;
 
