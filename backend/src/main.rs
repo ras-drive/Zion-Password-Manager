@@ -53,6 +53,7 @@ mod tests {
         let client = Client::tracked(rocket::build().mount("/", routes![build_dir])).unwrap();
         let req = client.get(uri!("/index.html"));
         let response = req.dispatch();
+
         assert_eq!(response.status(), Status::Ok);
     }
 
@@ -61,6 +62,7 @@ mod tests {
         let client = Client::tracked(rocket::build().mount("/", routes![build_dir])).unwrap();
         let req = client.get(uri!("/login/login.html"));
         let response = req.dispatch();
+
         assert_eq!(response.status(), Status::Ok);
     }
 
@@ -69,6 +71,7 @@ mod tests {
         let client = Client::tracked(rocket::build().mount("/", routes![build_dir])).unwrap();
         let req = client.get(uri!("/register/register.html"));
         let response = req.dispatch();
+        
         assert_eq!(response.status(), Status::Ok);
     }
 }
