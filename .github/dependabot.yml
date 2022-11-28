@@ -11,5 +11,5 @@ updates:
       interval: "weekly"
   - package-ecosystem: "npm"
     directory: "/frontend"
-    schecdule:
+    schedule:
       interval: "weekly"
