@@ -1,7 +1,7 @@
 use crate::schema::users;
 use diesel::{delete, insert_into, prelude::*};
 
-use super::{super::schema::users::dsl::*, establish_connection};
+use super::{super::super::schema::users::dsl::*, super::establish_connection};
 use std::io;
 
 use anyhow::Result;
@@ -24,6 +24,16 @@ pub struct User {
 }
 
 impl User {
+    ///
+    /// initializes a new user ready to be inserted into the database. 
+    /// before inserting into the database the password is stored plain, 
+    /// after inserting pbkdf2 encryption is used to hash the password.
+    /// 
+    /// ### example
+    /// ```
+    /// let user = User::new(1, "johndoe@example.com".to_string(), "hunter42".to_string());
+    /// ```
+    /// 
     pub fn new(
         user_id: i32,
         user_email: String,
