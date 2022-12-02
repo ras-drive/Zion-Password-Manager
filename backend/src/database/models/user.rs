@@ -7,13 +7,9 @@ use std::io;
 use anyhow::Result;
 
 use pbkdf2::{
-    password_hash::{
-        rand_core::OsRng,
-        PasswordHash, PasswordHasher, PasswordVerifier, SaltString
-    },
-    Pbkdf2
+    password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+    Pbkdf2,
 };
-
 
 #[derive(Queryable, Clone, Debug, Insertable, Selectable)]
 #[diesel(table_name = users)]
@@ -25,22 +21,18 @@ pub struct User {
 
 impl User {
     ///
-    /// initializes a new user ready to be inserted into the database. 
-    /// before inserting into the database the password is stored plain, 
+    /// initializes a new user ready to be inserted into the database.
+    /// before inserting into the database the password is stored plain,
     /// after inserting pbkdf2 encryption is used to hash the password.
-    /// 
+    ///
     /// ### example
     /// ```
     /// let user = User::new(1, "johndoe@example.com".to_string(), "hunter42".to_string());
     /// ```
-    /// 
-    pub fn new(
-        user_id: i32,
-        user_email: String,
-        password_string: String,
-    ) -> Self {
+    ///
+    pub fn new(user_email: String, password_string: String) -> Self {
         Self {
-            id: user_id,
+            id: 0,
             email: user_email,
             password_hash: password_string,
         }
@@ -51,7 +43,7 @@ impl User {
     ///
     /// user id is rewritten on insert to line up with database
     /// password_hash is finally rewritten to an encrypted pbkdf2 that can be verified against
-    /// 
+    ///
     pub async fn insert(&mut self) -> Result<()> {
         let mut conn = establish_connection();
 
@@ -72,21 +64,24 @@ impl User {
 
         let password_salt = SaltString::generate(&mut OsRng);
 
-        let hashed_password = Pbkdf2.hash_password(self.password_hash.as_bytes(), &password_salt)
-            .expect("error while hashing password").to_string();
+        let hashed_password = Pbkdf2
+            .hash_password(self.password_hash.as_bytes(), &password_salt)
+            .expect("error while hashing password")
+            .to_string();
 
         self.password_hash = hashed_password;
 
         insert_into(users).values(self.clone()).execute(&mut conn)?;
 
-        self.verify(password).expect("error while verifying password");
+        self.verify(password)
+            .expect("error while verifying password");
 
         Ok(())
     }
 
     ///
     /// tests password_hash against an unhashed password string using pbkdf2 crate
-    /// 
+    ///
     pub fn verify(&self, unhashed_password: String) -> pbkdf2::password_hash::Result<()> {
         let parsed_hash = PasswordHash::new(&self.password_hash).unwrap();
 
@@ -95,14 +90,14 @@ impl User {
 
     ///
     /// gets a result with a User struct from the user table
-    /// 
+    ///
     pub fn get_user_by_id(user_id: i32) -> Result<User> {
         let mut conn = establish_connection();
 
-    match users.filter(users::id.eq(user_id)).load::<User>(&mut conn) {
-        Ok(v) => Ok(v.first().unwrap().clone()),
-        Err(e) => Err(e.into())
-    }
+        match users.filter(users::id.eq(user_id)).load::<User>(&mut conn) {
+            Ok(v) => Ok(v.first().unwrap().clone()),
+            Err(e) => Err(e.into()),
+        }
     }
 
     /// This function mostly exists for test cases and when a user should be deleted a different process should be used which shifts the database.
@@ -131,11 +126,7 @@ impl User {
 
 impl Default for User {
     fn default() -> Self {
-        User::new(
-            i32::MAX,
-            "test@test.com".into(),
-            "test".into(),
-        )
+        User::new("test@test.com".into(), "test".into())
     }
 }
 
@@ -152,7 +143,8 @@ mod tests {
         let mut user = User::default();
         user.insert().await.expect("error inserting user");
 
-        user.verify(User::default().password_hash).expect("error while verifying password");
+        user.verify(User::default().password_hash)
+            .expect("error while verifying password");
 
         unsafe {
             user.delete(user.id).await.expect("error deleting user");

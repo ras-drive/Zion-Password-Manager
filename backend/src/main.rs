@@ -44,8 +44,8 @@ fn rocket() -> _ {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rocket::local::blocking::Client;
     use rocket::http::Status;
+    use rocket::local::blocking::Client;
     use rocket::uri;
 
     #[test]
@@ -71,7 +71,7 @@ mod tests {
         let client = Client::tracked(rocket::build().mount("/", routes![build_dir])).unwrap();
         let req = client.get(uri!("/register/register.html"));
         let response = req.dispatch();
-        
+
         assert_eq!(response.status(), Status::Ok);
     }
 }
