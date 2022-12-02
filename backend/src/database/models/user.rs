@@ -103,7 +103,7 @@ impl User {
     /// This function mostly exists for test cases and when a user should be deleted a different process should be used which shifts the database.
     ///
     /// ### Safety
-    /// This function panics unless run in a test enviroment
+    /// This function panics unless run in a test environment
     ///
     pub async unsafe fn delete(&mut self, user_id: i32) -> io::Result<User> {
         if !cfg!(test) {

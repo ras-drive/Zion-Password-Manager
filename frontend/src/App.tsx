@@ -22,12 +22,12 @@ const about_div = () => {
     <div>
         <ul>
             <li><p><a href="https://rocket.rs/">Rocket</a>:
-                Rocket is a powerful and extremly fast web framework for Nightly Rust that "just works"</p><br></br></li>
+                Rocket is a powerful and extremely fast web framework for Nightly Rust that "just works"</p><br></br></li>
             <li><p><a href="https://vitejs.dev/">Vite</a>:
                 A very easy to setup frontend framework that we are using with React in order to build our web pages</p><br></br></li>
-            <li><p><a href="https://www.mongodb.com/">MongoDB</a>:
-                MongoDB is a great cloud non-relational database that will allow for fast prototyping
-                and reliable cloud storage</p><br></br></li>
+            <li><p><a href="https://www.diesel.rs/">Diesel</a>:
+                Diesel is a high level Rust ORM that helps us to run and load PostgreSQL queries over abstractions,
+                allowing us to write effective queries against a relational database in Rust easily and safely</p><br></br></li>
         </ul>
         <br></br>
     </div>
