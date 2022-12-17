@@ -17,9 +17,9 @@ pub fn insert_user(user: Json<User>, dbpool: &State<PgPool>) -> UserResponse {
     let mut user = user.0;
     
     let user_id = users::table().select(id).order(id.desc()).limit(1)
-        .load::<i32>(&mut conn).expect("suitable id").first().unwrap() + 1;
+        .load::<i32>(&mut conn).expect("suitable id").first().unwrap_or_else(|| { &0 }).clone();
     
-    user.id = user_id;
+    user.id = user_id + 1;
 
     let password_string = user.password_hash.clone();
     let unhashed_password = password_string.as_bytes();
