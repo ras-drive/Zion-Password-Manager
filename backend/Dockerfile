@@ -27,6 +27,7 @@ WORKDIR /usr/src/app/Zion-Password-Manager
 RUN ["/bin/bash", "-c", "cd frontend; source ~/.nvm/nvm.sh; nvm use 16; npm i"]
 
 RUN echo "DATABASE_URL=postgres://postgres:password@database:5432/zion" > .env
+RUN echo "TEST_DATABASE_URL=postgres://postgres:password@database:5432/zion" >> .env
 
 RUN ["/bin/bash", "-c", "source $HOME/.cargo/env; source ~/.nvm/nvm.sh; nvm use 16; make build"]
 

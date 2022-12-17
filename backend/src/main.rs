@@ -1,13 +1,12 @@
 #![feature(decl_macro, proc_macro_hygiene)]
 
-use database::establish_connection;
-use std::path::{Path, PathBuf};
-use tokio::io;
-
 #[macro_use]
 extern crate dotenv_codegen;
 
-use rocket::{fs::NamedFile, get, launch, response::Redirect, routes};
+use std::path::{Path, PathBuf};
+use tokio::io;
+
+use rocket::{fs::NamedFile, get, launch, response::Redirect, routes, local::blocking::Client};
 
 pub mod database;
 pub mod schema;
@@ -35,22 +34,26 @@ fn register() -> Redirect {
 
 #[launch]
 fn rocket() -> _ {
-    establish_connection();
     rocket::build()
-        // .manage()
+        .attach(database::stage())
         .mount("/", routes![build_dir, index, login, register])
+}
+
+pub fn test_client() -> Client {
+    Client::tracked(rocket::build()
+        .attach(database::stage())
+        .mount("/", routes![build_dir, index, login, register])).unwrap()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use rocket::http::Status;
-    use rocket::local::blocking::Client;
     use rocket::uri;
 
     #[test]
     fn test_index_page() {
-        let client = Client::tracked(rocket::build().mount("/", routes![build_dir])).unwrap();
+        let client = test_client();
         let req = client.get(uri!("/index.html"));
         let response = req.dispatch();
 
@@ -59,7 +62,7 @@ mod tests {
 
     #[test]
     fn test_login_page() {
-        let client = Client::tracked(rocket::build().mount("/", routes![build_dir])).unwrap();
+        let client = test_client();
         let req = client.get(uri!("/login/login.html"));
         let response = req.dispatch();
 
@@ -68,7 +71,7 @@ mod tests {
 
     #[test]
     fn test_register_page() {
-        let client = Client::tracked(rocket::build().mount("/", routes![build_dir])).unwrap();
+        let client = test_client();
         let req = client.get(uri!("/register/register.html"));
         let response = req.dispatch();
 
