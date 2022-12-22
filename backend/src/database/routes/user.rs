@@ -29,7 +29,7 @@ pub fn insert_user(user: Json<User>, dbpool: &State<PgPool>) -> UserResponse {
     user.password_hash = hashed_password;
 
     match insert_into(users::table()).values(&user).execute(&mut conn) {
-        Ok(_) => UserResponse::Created(Json::from(String::from(r#"{{"status": "202", "message": User inserted}}"#))),
+        Ok(_) => UserResponse::Created(Json::from(String::from(r#"{{"status": "201", "message": User inserted}}"#))),
         Err(e) => UserResponse::BadRequest(Json::from(format!(r#"{{"status": "400", "message": {e}}}"#))),
     }
 }
