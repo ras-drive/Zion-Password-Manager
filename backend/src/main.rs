@@ -6,7 +6,7 @@ extern crate dotenv_codegen;
 use std::path::{Path, PathBuf};
 use tokio::io;
 
-use rocket::{fs::NamedFile, get, launch, response::Redirect, routes, local::blocking::Client};
+use rocket::{fs::NamedFile, get, launch, response::Redirect, routes, local::blocking::Client, catch, catchers};
 
 pub mod database;
 pub mod schema;
@@ -14,7 +14,13 @@ pub mod schema;
 #[get("/<file..>")]
 async fn build_dir(file: PathBuf) -> io::Result<NamedFile> {
     // NamedFile::open(Path::new("../static/").join(file)).await
-    NamedFile::open(Path::new("../frontend/dist").join(file)).await
+    match NamedFile::open(Path::new("../frontend/dist").join(file.clone())).await {
+        Ok(file) => Ok(file),
+        Err(e) => {
+            eprintln!("file {:?} not found\t{}", file.as_os_str(), e);
+            NamedFile::open(Path::new("../frontend/dist/errors/error_404.html")).await
+        },
+    }
 }
 
 #[get("/")]
@@ -32,17 +38,24 @@ fn register() -> Redirect {
     Redirect::temporary("/register/register.html")
 }
 
+#[catch(404)]
+fn error_404() -> Redirect {
+    Redirect::permanent("/errors/404")
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build()
         .attach(database::stage())
         .mount("/", routes![build_dir, index, login, register])
+        .register("/", catchers![error_404])
 }
 
 pub fn test_client() -> Client {
     Client::tracked(rocket::build()
         .attach(database::stage())
-        .mount("/", routes![build_dir, index, login, register])).unwrap()
+        .mount("/", routes![build_dir, index, login, register])
+        .register("/", catchers![error_404])).unwrap()
 }
 
 #[cfg(test)]

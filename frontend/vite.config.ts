@@ -17,6 +17,7 @@ export default defineConfig({
         main: resolve(root, 'index.html'),
         login: resolve(root, 'login/login.html'),
         register: resolve(root, 'register/register.html'),
+        error404: resolve(root, 'errors/error_404.html')
       }
     }
   }
