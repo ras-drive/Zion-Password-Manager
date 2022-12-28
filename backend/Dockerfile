@@ -24,8 +24,6 @@ RUN git clone https://github.com/ras-drive/Zion-Password-Manager.git
 
 WORKDIR /usr/src/app/Zion-Password-Manager
 
-RUN git checkout actix_rewrite
-
 RUN ["/bin/bash", "-c", "cd frontend; source ~/.nvm/nvm.sh; nvm use 16; npm i"]
 
 RUN echo "DATABASE_URL=postgres://postgres:password@database:5432/zion" > .env
