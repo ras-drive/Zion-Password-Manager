@@ -2,13 +2,12 @@ use crate::schema::users;
 use diesel::prelude::*;
 use regex::Regex;
 
-use std::fmt;
 use std::error::Error as StdError;
+use std::fmt;
 
-use rocket::serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive( Serialize, Deserialize, Queryable, Clone, Debug, Insertable)]
-#[serde(crate = "rocket::serde")]
+#[derive(Serialize, Deserialize, Queryable, Clone, Debug, Insertable)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: i32,
@@ -28,17 +27,16 @@ impl User {
     ///
     pub fn new(user_email: String, password_string: String) -> Result<Self, UserError> {
         // HTML standard email verification regex
-        let re = Regex::new(r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$").unwrap();
+        let re =
+            Regex::new(r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$")
+                .unwrap();
 
         match re.is_match(&user_email) {
-            true => {
-                Ok(
-                    Self {
-                        id: 0,
-                        email: user_email,
-                        password_hash: password_string,
-                    })
-            },
+            true => Ok(Self {
+                id: 0,
+                email: user_email,
+                password_hash: password_string,
+            }),
             false => Err(UserError::InvalidEmail),
         }
     }

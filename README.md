@@ -15,11 +15,7 @@ pick your distributions (if yours isn't listed I prefer the Arch Docs)
 * [Fedora](https://docs.fedoraproject.org/en-US/quick-docs/postgresql/)
 * [Arch](https://wiki.archlinux.org/title/PostgreSQL)
 
-You need to make sure you have a nightly [Rust](https://www.rust-lang.org/learn/get-started) toolchain installed.
-
-```shell
-rustup override set nightly
-```
+You need to make sure you have a [Rust](https://www.rust-lang.org/learn/get-started) toolchain installed.
 
 You also need to make sure you are using node 16, NVM (Node Version Manager) is the easiest way to do this.
 

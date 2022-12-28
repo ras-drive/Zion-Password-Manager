@@ -3,91 +3,63 @@
 #[macro_use]
 extern crate dotenv_codegen;
 
-use std::path::{Path, PathBuf};
-use tokio::io;
-
-use rocket::{fs::NamedFile, get, launch, response::Redirect, routes, local::blocking::Client, catch, catchers};
+use crate::database::establish_connection;
+use actix_files::Files;
+use actix_web::{
+    http::header::LOCATION, middleware, web, App, HttpResponse, HttpServer, Responder,
+};
 
 pub mod database;
 pub mod schema;
 
-#[get("/<file..>")]
-async fn build_dir(file: PathBuf) -> io::Result<NamedFile> {
-    // NamedFile::open(Path::new("../static/").join(file)).await
-    match NamedFile::open(Path::new("../frontend/dist").join(file.clone())).await {
-        Ok(file) => Ok(file),
-        Err(e) => {
-            eprintln!("file {:?} not found\t{}", file.as_os_str(), e);
-            NamedFile::open(Path::new("../frontend/dist/errors/error_404.html")).await
-        },
-    }
+// #[catch(404)]
+pub async fn error_404() -> impl Responder {
+    HttpResponse::PermanentRedirect()
+        .insert_header((LOCATION, "/errors/error_404.html"))
+        .finish()
 }
 
-#[get("/")]
-fn index() -> Redirect {
-    Redirect::temporary("/index.html")
-}
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    log::info!("starting HTTP server at http://localhost:8080");
 
-#[get("/login")]
-fn login() -> Redirect {
-    Redirect::temporary("/login/login.html")
-}
-
-#[get("/register")]
-fn register() -> Redirect {
-    Redirect::temporary("/register/register.html")
-}
-
-#[catch(404)]
-fn error_404() -> Redirect {
-    Redirect::permanent("/errors/404")
-}
-
-#[launch]
-fn rocket() -> _ {
-    rocket::build()
-        .attach(database::stage())
-        .mount("/", routes![build_dir, index, login, register])
-        .register("/", catchers![error_404])
-}
-
-pub fn test_client() -> Client {
-    Client::tracked(rocket::build()
-        .attach(database::stage())
-        .mount("/", routes![build_dir, index, login, register])
-        .register("/", catchers![error_404])).unwrap()
+    let pool = establish_connection();
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(pool.clone()))
+            .wrap(middleware::Logger::default())
+            .configure(database::routes::user::configure)
+            .service(
+                Files::new("/", "../frontend/dist")
+                    .prefer_utf8(true)
+                    .index_file("index.html"),
+            )
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rocket::http::Status;
-    use rocket::uri;
+    use actix_web::test;
 
-    #[test]
-    fn test_index_page() {
-        let client = test_client();
-        let req = client.get(uri!("/index.html"));
-        let response = req.dispatch();
+    #[actix_web::test]
+    async fn test_index_page() {
+        let app = test::init_service(
+            App::new().wrap(middleware::Logger::default()).service(
+                Files::new("/", "../frontend/dist")
+                    .prefer_utf8(true)
+                    .index_file("index.html"),
+            ),
+        )
+        .await;
 
-        assert_eq!(response.status(), Status::Ok);
-    }
+        let req = test::TestRequest::get().uri("/").to_request();
+        let resp = test::call_service(&app, req).await;
 
-    #[test]
-    fn test_login_page() {
-        let client = test_client();
-        let req = client.get(uri!("/login/login.html"));
-        let response = req.dispatch();
-
-        assert_eq!(response.status(), Status::Ok);
-    }
-
-    #[test]
-    fn test_register_page() {
-        let client = test_client();
-        let req = client.get(uri!("/register/register.html"));
-        let response = req.dispatch();
-
-        assert_eq!(response.status(), Status::Ok);
+        assert!(resp.status().is_success())
     }
 }
