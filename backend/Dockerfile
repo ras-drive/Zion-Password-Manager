@@ -13,7 +13,7 @@ RUN ["/bin/bash", "-c", "source ~/.nvm/nvm.sh; nvm install 16; nvm alias default
 # get cargo
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 
-RUN ["/bin/bash", "-c", "source $HOME/.cargo/env; rustup override set nightly"]
+#RUN ["/bin/bash", "-c", "source $HOME/.cargo/env; rustup override set nightly"]
 
 RUN ["/bin/bash", "-c", "source $HOME/.cargo/env; cargo install diesel_cli --no-default-features --features postgres"]
 
@@ -23,6 +23,8 @@ WORKDIR /usr/src/app
 RUN git clone https://github.com/ras-drive/Zion-Password-Manager.git
 
 WORKDIR /usr/src/app/Zion-Password-Manager
+
+RUN git checkout actix_rewrite
 
 RUN ["/bin/bash", "-c", "cd frontend; source ~/.nvm/nvm.sh; nvm use 16; npm i"]
 

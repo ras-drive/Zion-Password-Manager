@@ -1,8 +1,5 @@
-use rocket::fairing::AdHoc;
 use diesel::pg::PgConnection;
-use diesel::r2d2::{ Pool, PooledConnection, ConnectionManager, PoolError };
-
-use crate::database::routes::user::insert_user;
+use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
 
 pub mod models;
 pub mod routes;
@@ -25,30 +22,17 @@ fn init_pool(database_url: &str) -> Result<PgPool, PoolError> {
     Pool::builder().build(manager)
 }
 
-
 pub fn pg_pool_handler(pool: &PgPool) -> Result<PgPooledConnection, PoolError> {
-    let pool = pool.get().expect("connection pool");
+    let pool = pool.get()?;
     Ok(pool)
-}
-
-pub fn stage() -> AdHoc {
-    AdHoc::on_ignite("Database Stage", |rocket| async {
-        rocket
-            .manage(establish_connection())
-            .mount("/api", rocket::routes![insert_user])
-    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_client;
 
     #[test]
     fn test_connection() {
-        let client = test_client();
-        let pool = client.rocket().state::<PgPool>();
-
-        assert!(pool.is_some())
+        assert!(establish_connection().get().is_ok())
     }
 }

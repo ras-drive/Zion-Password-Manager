@@ -21,8 +21,8 @@ const about_div = () => {
     <br></br>
     <div>
         <ul>
-            <li><p><a href='https://rocket.rs/'>Rocket</a>:
-                Rocket is a powerful and extremely fast web framework for Nightly Rust that 'just works'</p><br></br></li>
+            <li><p><a href='https://actix.rs/'>Actix</a>:
+                Actix is a powerful and extremely fast web framework for Rust that has very much support behind it</p><br></br></li>
             <li><p><a href='https://vitejs.dev/'>Vite</a>:
                 A very easy to setup frontend framework that we are using with React in order to build our web pages</p><br></br></li>
             <li><p><a href='https://www.diesel.rs/'>Diesel</a>:
@@ -54,7 +54,7 @@ const nav_bar = () => {
     <ul className='nav-links'>
         <div className='menu'>
             <li><a href='/'>Home</a></li>
-            <li><a href='/login'>Log In</a></li>
+            <li><a href='/login/login.html'>Log In</a></li>
             <li><a href='#about'>About</a></li>
             <li><a href='#contact'>Contact</a></li>
             <li><a href='https://github.com/ras-drive/zion-password-manager'>Code</a></li>
