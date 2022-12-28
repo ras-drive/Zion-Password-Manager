@@ -22,9 +22,9 @@ WORKDIR /usr/src/app
 # clone project source
 RUN git clone https://github.com/ras-drive/Zion-Password-Manager.git
 
-RUN git checkout actix_rewrite
-
 WORKDIR /usr/src/app/Zion-Password-Manager
+
+RUN git checkout actix_rewrite
 
 RUN ["/bin/bash", "-c", "cd frontend; source ~/.nvm/nvm.sh; nvm use 16; npm i"]
 
