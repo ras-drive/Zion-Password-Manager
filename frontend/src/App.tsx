@@ -1,8 +1,8 @@
 import './App.css'
-
+import React from 'react';
+import { error } from 'console';
 
 function App() {
-
   return (
     <div className='App'>
       { nav_bar() }
@@ -55,8 +55,7 @@ const nav_bar = () => {
         <div className='menu'>
             <li><a href='/'>Home</a></li>
             <li><a href='/login/login.html'>Log In</a></li>
-            <li><a href='#about'>About</a></li>
-            <li><a href='#contact'>Contact</a></li>
+            <li><a href='/register/register.html'>Register</a></li>
             <li><a href='https://github.com/ras-drive/zion-password-manager'>Code</a></li>
         </div>
     </ul>
@@ -86,4 +85,4 @@ const footer = () => {
 }
 
 
-export default App
+export default {App, nav_bar}

@@ -1,8 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import nav_bar from '../App'
+import Form from '../components/login/form'
+import '../components/form.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <h1>Login Dummy Page</h1>
+    { nav_bar.nav_bar() }
+    <Form></Form>
   </React.StrictMode>
 )
