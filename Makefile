@@ -2,9 +2,9 @@ configure:
 	./configure.sh
 	
 build:
-	pushd frontend; npm run build; \
-	cp public/* dist/assets/; popd; \
-	pushd backend; cargo build
+	cd frontend; npm run build; \
+	cp public/* dist/assets/; cd ..; \
+	cd backend; cargo build
 
 run:
 	cd backend; \
@@ -14,13 +14,13 @@ dev:
 	make build; RUST_LOG=debug make run
 
 test:
-	pushd backend; \
+	cd backend; \
 	RUST_BACKTRACE=1 RUST_LOG=debug cargo test
 
 clean:
-	pushd backend; cargo clean; popd; \
-	pushd frontend; npm run clean
+	cd backend; cargo clean; cd ..; \
+	cd frontend; npm run clean
 
 lint:
-	pushd frontend; npm run lint; popd; \
-	pushd backend; cargo fmt; cargo clippy
+	cd frontend; npm run lint; cd ..; \
+	cd backend; cargo fmt; cargo clippy
