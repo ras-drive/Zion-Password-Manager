@@ -77,9 +77,12 @@ pub async fn login(
     auth_data: web::Json<AuthData>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, actix_web::Error> {
+    let mut conn = pool.get().unwrap();
     let user = web::block(move || query(auth_data.into_inner(), pool)).await??;
 
     let session_cookie = SessionCookie::new(user.email);
+    session_cookie.insert(&mut conn).unwrap();
+
     let session_string = serde_json::to_string(&session_cookie).unwrap();
 
     Identity::login(&req.extensions(), session_string).unwrap();
@@ -91,9 +94,9 @@ pub async fn login(
 /// Logs user out and reroutes them to the index page
 ///
 #[get("/logout")]
-pub async fn logout(identity: Identity) -> HttpResponse {
+pub async fn logout(identity: Identity) -> impl Responder {
     identity.logout();
-    // HttpResponse::NoContent().finish()
+
     HttpResponse::Found()
         .append_header(("Location", "/"))
         .finish()

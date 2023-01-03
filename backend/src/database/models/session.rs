@@ -1,5 +1,6 @@
 use crate::schema::session_cookies::user_email;
 use crate::{database::routes::ServiceError, schema::session_cookies};
+use actix_identity::Identity;
 use diesel::delete;
 use diesel::{insert_into, prelude::*};
 use serde::{Deserialize, Serialize};
@@ -68,5 +69,21 @@ impl SessionCookie {
                 }
             }
         }
+    }
+
+    pub fn verify(&self, conn: &mut PgConnection) -> bool {
+        let binding = session_cookies::table
+            .filter(user_email.eq(self.user_email.clone()))
+            .load::<SessionCookie>(conn)
+            .expect("session cookie");
+        let db_cookie = binding.first().unwrap();
+
+        self.cookie_id == db_cookie.cookie_id
+    }
+}
+
+impl From<Identity> for SessionCookie {
+    fn from(value: Identity) -> Self {
+        serde_json::from_str(&value.id().expect("session cookie")).unwrap()
     }
 }
