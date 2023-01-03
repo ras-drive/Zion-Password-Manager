@@ -1,5 +1,10 @@
 use crate::{
-    database::{models::user::User, pg_pool_handler, routes::ServiceError, PgPool},
+    database::{
+        models::{session::SessionCookie, user::User},
+        pg_pool_handler,
+        routes::ServiceError,
+        PgPool,
+    },
     schema::users::dsl::*,
 };
 use actix_web::{
@@ -19,7 +24,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// Takes a json struct containing an email and password and fits the user into the database.
 /// Returns an OK 200 response if the user has been successfully registered
-/// 
+///
 #[post("/user")]
 pub async fn insert_user(user: web::Json<AuthData>, dbpool: web::Data<PgPool>) -> impl Responder {
     let mut conn = pg_pool_handler(&dbpool).expect("database connection");
@@ -51,7 +56,7 @@ pub async fn insert_user(user: web::Json<AuthData>, dbpool: web::Data<PgPool>) -
 
     match insert_into(users::table()).values(&user).execute(&mut conn) {
         Ok(r) => {
-            if r > 1 || r == 0 {
+            if !r == 1 {
                 log::warn!("No rows were affected")
             }
         }
@@ -63,31 +68,35 @@ pub async fn insert_user(user: web::Json<AuthData>, dbpool: web::Data<PgPool>) -
         .expect("http response")
 }
 
-#[get("/login/user")]
-pub async fn get_user_by_session(identity: Identity) -> impl Responder {
-    println!("id: {:#?}", identity.id().unwrap());
-
-    HttpResponse::Ok()
-}
-
+///
+/// Logs user in by providing a session cookie that contains their email and a uuid generated when the cookie is created
+///
 #[post("/login/user")]
 pub async fn login(
     req: HttpRequest,
     auth_data: web::Json<AuthData>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, actix_web::Error> {
+    let mut conn = pool.get().unwrap();
     let user = web::block(move || query(auth_data.into_inner(), pool)).await??;
 
-    let user_string = serde_json::to_string(&user).unwrap();
-    Identity::login(&req.extensions(), user_string).unwrap();
+    let session_cookie = SessionCookie::new(user.email);
+    session_cookie.insert(&mut conn).unwrap();
+
+    let session_string = serde_json::to_string(&session_cookie).unwrap();
+
+    Identity::login(&req.extensions(), session_string).unwrap();
 
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[get("/login/logout")]
-pub async fn logout(identity: Identity) -> HttpResponse {
+///
+/// Logs user out and reroutes them to the index page
+///
+#[get("/logout")]
+pub async fn logout(identity: Identity) -> impl Responder {
     identity.logout();
-    // HttpResponse::NoContent().finish()
+
     HttpResponse::Found()
         .append_header(("Location", "/"))
         .finish()
@@ -104,17 +113,12 @@ pub fn verify(hash: &str, password: &str) -> Result<bool, ServiceError> {
 }
 
 pub fn configure(config: &mut ServiceConfig) {
-    config.service(scope("/api").service(services![
-        insert_user,
-        login,
-        logout,
-        get_user_by_session
-    ]));
+    config.service(scope("/api").service(services![insert_user, login, logout]));
 }
 
 ///
 /// used with a json wrapper for user registration
-/// 
+///
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct AuthData {
     pub email: String,
@@ -140,7 +144,6 @@ impl From<User> for LoggedUser {
         Self { email: user.email }
     }
 }
-
 
 fn query(auth_data: AuthData, pool: web::Data<PgPool>) -> Result<LoggedUser, ServiceError> {
     let mut conn = pool.get().unwrap();
