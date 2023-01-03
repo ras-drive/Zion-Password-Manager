@@ -4,7 +4,7 @@ extern crate dotenv_codegen;
 use crate::database::establish_connection;
 use actix_files::Files;
 use actix_identity::IdentityMiddleware;
-use actix_session::{SessionMiddleware, storage::CookieSessionStore};
+use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use actix_web::{
     http::header::LOCATION, middleware, web, App, HttpResponse, HttpServer, Responder,
 };
@@ -27,6 +27,7 @@ async fn main() -> std::io::Result<()> {
     let secret_key = Key::generate();
 
     let pool = establish_connection();
+    log::info!("database connection established");
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))

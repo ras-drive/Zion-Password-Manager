@@ -1,19 +1,19 @@
 use crate::{
-    database::{models::user::User, pg_pool_handler, PgPool, routes::ServiceError},
+    database::{models::user::User, pg_pool_handler, routes::ServiceError, PgPool},
     schema::users::dsl::*,
 };
 use actix_web::{
-    post,
+    get, post, services,
     web::{self, scope, ServiceConfig},
-    HttpResponse, Responder, services, HttpRequest, HttpMessage, get
+    HttpMessage, HttpRequest, HttpResponse, Responder,
 };
 use diesel::{associations::HasTable, insert_into, prelude::*};
 
+use actix_identity::Identity;
 use pbkdf2::{
-    password_hash::{rand_core::OsRng, PasswordHasher, SaltString, PasswordVerifier, PasswordHash},
+    password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Pbkdf2,
 };
-use actix_identity::Identity;
 use serde::{Deserialize, Serialize};
 
 #[post("/user")]
@@ -39,7 +39,11 @@ pub async fn insert_user(user: web::Json<AuthData>, dbpool: web::Data<PgPool>) -
         .expect("hashed password")
         .to_string();
 
-    let user = User { id: user_id + 1, email: user.email, password_hash:  hashed_password};
+    let user = User {
+        id: user_id + 1,
+        email: user.email,
+        password_hash: hashed_password,
+    };
 
     match insert_into(users::table()).values(&user).execute(&mut conn) {
         Ok(r) => {
@@ -50,11 +54,18 @@ pub async fn insert_user(user: web::Json<AuthData>, dbpool: web::Data<PgPool>) -
         Err(e) => log::info!("database panicked\n{}", e),
     };
 
-    HttpResponse::Ok().message_body("user successfully registered").expect("http response")
+    HttpResponse::Ok()
+        .message_body("user successfully registered")
+        .expect("http response")
 }
 
 pub fn configure(config: &mut ServiceConfig) {
-    config.service(scope("/api").service(services![insert_user, login, logout, get_user_by_session]));
+    config.service(scope("/api").service(services![
+        insert_user,
+        login,
+        logout,
+        get_user_by_session
+    ]));
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -65,7 +76,10 @@ pub struct AuthData {
 
 impl From<User> for AuthData {
     fn from(user: User) -> Self {
-        Self { email: user.email, password: user.password_hash }
+        Self {
+            email: user.email,
+            password: user.password_hash,
+        }
     }
 }
 
@@ -77,7 +91,9 @@ pub struct LoggedUser {
 
 impl From<User> for LoggedUser {
     fn from(user: User) -> Self {
-        Self { email: user.email.to_string() }
+        Self {
+            email: user.email,
+        }
     }
 }
 
@@ -92,27 +108,29 @@ pub async fn get_user_by_session(identity: Identity) -> impl Responder {
 pub async fn login(
     req: HttpRequest,
     auth_data: web::Json<AuthData>,
-    pool: web::Data<PgPool>) -> Result<HttpResponse, actix_web::Error> {
-        let user = web::block(move || query(auth_data.into_inner(), pool)).await??;
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, actix_web::Error> {
+    let user = web::block(move || query(auth_data.into_inner(), pool)).await??;
 
-        let user_string = serde_json::to_string(&user).unwrap();
-        Identity::login(&req.extensions(), user_string).unwrap();
+    let user_string = serde_json::to_string(&user).unwrap();
+    Identity::login(&req.extensions(), user_string).unwrap();
 
-        Ok(HttpResponse::NoContent().finish())
+    Ok(HttpResponse::NoContent().finish())
 }
 
 #[get("/login/logout")]
 pub async fn logout(identity: Identity) -> HttpResponse {
     identity.logout();
-    HttpResponse::NoContent().finish()
+    // HttpResponse::NoContent().finish()
+    HttpResponse::Found().append_header(("Location", "/")).finish()
 }
 
 pub fn verify(hash: &str, password: &str) -> Result<bool, ServiceError> {
-    let parsed_hash = PasswordHash::new(&hash).unwrap();
-    
+    let parsed_hash = PasswordHash::new(hash).unwrap();
+
     match Pbkdf2.verify_password(password.as_bytes(), &parsed_hash) {
         Ok(_) => Ok(true),
-        Err(pbkdf2::password_hash::Error::Password) => { Ok(false) },
+        Err(pbkdf2::password_hash::Error::Password) => Ok(false),
         Err(_) => Err(ServiceError::InternalServerError),
     }
 }
@@ -122,7 +140,8 @@ fn query(auth_data: AuthData, pool: web::Data<PgPool>) -> Result<LoggedUser, Ser
 
     let mut items = users
         .filter(email.eq(&auth_data.email))
-        .load::<User>(&mut conn).expect("users");
+        .load::<User>(&mut conn)
+        .expect("users");
 
     if let Some(user) = items.pop() {
         if let Ok(matching) = verify(&user.password_hash, &auth_data.password) {
