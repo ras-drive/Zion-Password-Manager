@@ -16,6 +16,15 @@ li {
     list-style: none;
 }
 
+.login-widget {
+    width:300px;
+    margin:0 auto;
+}
+
+.login-widget h1 {
+    font-size: 50px;
+}
+
 /* NAVBAR STYLING STARTS */
 .navbar {
     display: flex;

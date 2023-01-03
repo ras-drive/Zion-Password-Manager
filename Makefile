@@ -8,14 +8,14 @@ build:
 
 run:
 	cd backend; \
-	RUST_BACKTRACE=1 RUST_LOG=actix_web=debug cargo run
+	RUST_LOG=debug cargo run
 
 dev:
-	make build; make run
+	make build; RUST_LOG=debug make run
 
 test:
 	cd backend; \
-	RUST_BACKTRACE=1 RUST_LOG=actix_web=debug cargo test
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo test
 
 clean:
 	cd backend; cargo clean; cd ..;\
