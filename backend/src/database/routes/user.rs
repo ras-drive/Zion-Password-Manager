@@ -57,7 +57,7 @@ pub fn configure(config: &mut ServiceConfig) {
     config.service(scope("/api").service(services![insert_user, login, logout, get_user_by_session]));
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct AuthData {
     pub email: String,
     pub password: String,
@@ -141,8 +141,10 @@ mod tests {
     use super::*;
     use actix_identity::IdentityMiddleware;
     use actix_web::{test, App};
+    use serial_test::serial;
 
     #[actix_web::test]
+    #[serial]
     async fn test_user_insert() {
         let pool = establish_connection();
         let json: AuthData = User::default().into();
@@ -166,6 +168,7 @@ mod tests {
     }
 
     #[actix_web::test]
+    #[serial]
     async fn test_user_login() {
         let pool = establish_connection();
         let json: AuthData = User::default().into();
@@ -179,12 +182,19 @@ mod tests {
         .await;
 
         let req = test::TestRequest::post()
+            .uri("/api/user")
+            .set_json(json.clone())
+            .to_request();
+        let resp = test::call_service(&app, req).await;
+
+        assert!(resp.status().is_success());
+
+        let req = test::TestRequest::post()
             .uri("/api/login/user")
             .set_json(json)
             .to_request();
         let resp = test::call_service(&app, req).await;
 
-        println!("{}", resp.status());
         assert!(resp.status().is_success())
     }
 }
