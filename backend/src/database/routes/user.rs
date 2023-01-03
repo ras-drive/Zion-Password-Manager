@@ -16,6 +16,10 @@ use pbkdf2::{
 };
 use serde::{Deserialize, Serialize};
 
+///
+/// Takes a json struct containing an email and password and fits the user into the database.
+/// Returns an OK 200 response if the user has been successfully registered
+/// 
 #[post("/user")]
 pub async fn insert_user(user: web::Json<AuthData>, dbpool: web::Data<PgPool>) -> impl Responder {
     let mut conn = pg_pool_handler(&dbpool).expect("database connection");
@@ -48,10 +52,10 @@ pub async fn insert_user(user: web::Json<AuthData>, dbpool: web::Data<PgPool>) -
     match insert_into(users::table()).values(&user).execute(&mut conn) {
         Ok(r) => {
             if r > 1 || r == 0 {
-                log::info!("No rows were affected")
+                log::warn!("No rows were affected")
             }
         }
-        Err(e) => log::info!("database panicked\n{}", e),
+        Err(e) => log::error!("database panicked\n{}", e),
     };
 
     HttpResponse::Ok()
@@ -59,47 +63,9 @@ pub async fn insert_user(user: web::Json<AuthData>, dbpool: web::Data<PgPool>) -
         .expect("http response")
 }
 
-pub fn configure(config: &mut ServiceConfig) {
-    config.service(scope("/api").service(services![
-        insert_user,
-        login,
-        logout,
-        get_user_by_session
-    ]));
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct AuthData {
-    pub email: String,
-    pub password: String,
-}
-
-impl From<User> for AuthData {
-    fn from(user: User) -> Self {
-        Self {
-            email: user.email,
-            password: user.password_hash,
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-
-pub struct LoggedUser {
-    email: String,
-}
-
-impl From<User> for LoggedUser {
-    fn from(user: User) -> Self {
-        Self {
-            email: user.email,
-        }
-    }
-}
-
 #[get("/login/user")]
 pub async fn get_user_by_session(identity: Identity) -> impl Responder {
-    println!("id: {:?}", identity.id().unwrap());
+    println!("id: {:#?}", identity.id().unwrap());
 
     HttpResponse::Ok()
 }
@@ -122,7 +88,9 @@ pub async fn login(
 pub async fn logout(identity: Identity) -> HttpResponse {
     identity.logout();
     // HttpResponse::NoContent().finish()
-    HttpResponse::Found().append_header(("Location", "/")).finish()
+    HttpResponse::Found()
+        .append_header(("Location", "/"))
+        .finish()
 }
 
 pub fn verify(hash: &str, password: &str) -> Result<bool, ServiceError> {
@@ -134,6 +102,45 @@ pub fn verify(hash: &str, password: &str) -> Result<bool, ServiceError> {
         Err(_) => Err(ServiceError::InternalServerError),
     }
 }
+
+pub fn configure(config: &mut ServiceConfig) {
+    config.service(scope("/api").service(services![
+        insert_user,
+        login,
+        logout,
+        get_user_by_session
+    ]));
+}
+
+///
+/// used with a json wrapper for user registration
+/// 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct AuthData {
+    pub email: String,
+    pub password: String,
+}
+
+impl From<User> for AuthData {
+    fn from(user: User) -> Self {
+        Self {
+            email: user.email,
+            password: user.password_hash,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct LoggedUser {
+    email: String,
+}
+
+impl From<User> for LoggedUser {
+    fn from(user: User) -> Self {
+        Self { email: user.email }
+    }
+}
+
 
 fn query(auth_data: AuthData, pool: web::Data<PgPool>) -> Result<LoggedUser, ServiceError> {
     let mut conn = pool.get().unwrap();
