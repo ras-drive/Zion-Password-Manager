@@ -35,6 +35,14 @@ make build
 make run
 ```
 
+going to [LocalHost](http://127.0.0.1:8080/) will now show the home page for Zion!
+
+you can also run the test suite after configuring and building by running
+
+```shell
+make test
+```
+
 ## Runing in Docker
 
 To run with docker first check that the docker service has been started

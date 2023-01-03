@@ -1,5 +1,32 @@
 #!/usr/bin/bash
 
+# checks if rust toolchain is installed
+if ! command -v rustup &> /dev/null
+then
+    echo "please install the rust toolchain to proceed"
+    exit
+else
+    echo "rust toolchain is installed"
+fi
+
+# checks if node is installed and at least version 16
+if ! command -v node &> /dev/null
+then
+    echo "please install node to proceed"
+    exit
+else
+    nodeVersion=$(node -v)
+    nodeVersion=${nodeVersion:1:2}
+
+    if [ "$nodeVersion" -gt 15 ]
+    then
+        echo "node is at least version 16"
+    else
+        echo "node must be at least version 16, please use nvm to install a newer version"
+        exit
+    fi
+fi
+
 cd frontend || exit
 npm i
 
