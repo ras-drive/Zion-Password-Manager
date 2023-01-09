@@ -12,7 +12,7 @@ cleanup () {
 trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP INT QUIT PIPE TERM
 
 docker-compose -p ci build
-docker-compose -p ci up database test -d
+docker-compose -p ci up database test&
 
 # docker-compose -p ci exec test make test
 TEST_EXIT_CODE=`docker wait ci-test-1`
