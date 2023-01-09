@@ -17,4 +17,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Docker Compose
-      run: docker-compose up --abort-on-container-exit
+      run: ./docker-compose-test.sh # docker-compose up --abort-on-container-exit
