@@ -22,7 +22,16 @@ actix-identity = "0.5.2"
 actix-session = { version = "0.7.2", features = ["cookie-session"] }
 derive_more = "0.99"
 log = "0.4"
-env_logger = "0.10"
+# env_logger = "0.10"
+tracing-actix-web = "0.7"
+tracing = { version = "0.1", features = ["log"] }
+# opentelemetry = { version = "0.17", features = ["rt-tokio-current-thread"] }
+# opentelemetry-jaeger = { version = "0.16", features = ["rt-tokio-current-thread"] }
+# tracing-opentelemetry = { version = "0.17" }
+tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
+# tracing-bunyan-formatter = "0.3"
+tracing-log = "0.1"
+# flexi_logger = "0.24"
 
 [dependencies.cookie]
 version = "0.16"
