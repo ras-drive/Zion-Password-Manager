@@ -19,11 +19,24 @@ services:
       retries: 5
     networks:
       - postgres-compose-network
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: ./test-entrypoint.sh
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - postgres-compose-network
       
   server:
     build:
       context: .
       dockerfile: Dockerfile
+    entrypoint: ./run-entrypoint.sh
+    restart: always
     expose:
       - 8000
     ports:

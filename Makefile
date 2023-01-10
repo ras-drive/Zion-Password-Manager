@@ -23,4 +23,5 @@ clean:
 
 lint:
 	cd frontend; npm run lint; cd ..; \
-	cd backend; cargo fmt; cargo clippy
+	cd backend; cargo fmt; cargo clippy; cd ..; \
+	shellcheck *.sh;

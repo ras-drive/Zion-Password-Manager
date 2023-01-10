@@ -14,6 +14,8 @@ RUN ["/bin/bash", "-c", "cargo install diesel_cli --no-default-features --featur
 
 WORKDIR /usr/src/app
 
+COPY test-entrypoint.sh /
+COPY docker-compose-run.sh /
 COPY . .
 
 RUN ["/bin/bash", "-c", "cd frontend; source ~/.nvm/nvm.sh; nvm use 16; npm i"]
@@ -24,5 +26,3 @@ RUN echo "TEST_DATABASE_URL=postgres://postgres:password@database:5432/zion" >> 
 RUN ["/bin/bash", "-c", "source ~/.nvm/nvm.sh; nvm use 16; make build"]
 
 EXPOSE 8000
-
-ENTRYPOINT ["/bin/bash", "-c", "cd backend/migrations; diesel migration run; cd ../..; make test"]
