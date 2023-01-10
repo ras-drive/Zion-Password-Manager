@@ -15,7 +15,7 @@ docker-compose -p ci build
 docker-compose -p ci up --abort-on-container-exit
 
 # docker-compose -p ci exec test make test
-TEST_EXIT_CODE=`docker wait ci-test-1`
+TEST_EXIT_CODE=`docker wait test`
 
 if [ $? -ne 0 ] ; then
   printf "${RED}Docker Compose Failed${NC}\n"
