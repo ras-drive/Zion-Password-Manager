@@ -10,6 +10,18 @@ run:
 	cd backend; \
 	RUST_LOG=debug cargo run
 
+docker_run:
+	cd backend/migrations; \
+	diesel migration run; \
+	cd ../../backend; \
+	RUST_LOG=debug ADDR=DOCKER cargo run
+
+docker_test:
+	cd backend/migrations; \
+	diesel migration run; \
+	cd ../../backend; \
+	RUST_LOG=debug ADDR=DOCKER cargo test
+
 dev:
 	make build; RUST_LOG=debug make run
 

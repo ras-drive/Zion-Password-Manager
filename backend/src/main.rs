@@ -23,11 +23,16 @@ pub async fn error_404() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-    log::info!("starting HTTP server at http://localhost:8080");
     let secret_key = Key::generate();
+
+    let ip_addr = match std::env::var("ADDR").unwrap_or("LOCAL".to_string()).as_str() {
+        "DOCKER" => { "0.0.0.0" },
+        _ => { "127.0.0.1" },
+    };
 
     let pool = establish_connection();
     log::info!("database connection established");
+    log::info!("starting HTTP server at http://{}:8080", ip_addr);
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
@@ -46,7 +51,7 @@ async fn main() -> std::io::Result<()> {
                     .index_file("index.html"),
             )
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((ip_addr, 8080))?
     .run()
     .await
 }

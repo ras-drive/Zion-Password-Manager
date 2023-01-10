@@ -8,9 +8,7 @@ cleanup () {
   docker-compose -p zion rm -f
 }
 
-trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP INT QUIT PIPE TERM
+trap 'cleanup ; printf "${RED}Shutting down${NC}\n"' HUP INT QUIT PIPE TERM
 
 docker-compose -p zion build && \
-    docker-compose -p zion up database server -d
-
-docker wait zion_server_1
+    docker-compose -p zion up database server
