@@ -26,7 +26,3 @@ RUN echo "TEST_DATABASE_URL=postgres://postgres:password@database:5432/zion" >> 
 RUN ["/bin/bash", "-c", "source ~/.nvm/nvm.sh; nvm use 16; make build"]
 
 EXPOSE 8000
-
-# RUN ["/bin/bash", "-c", "cd backend/migrations; diesel migration run"]
-
-# ENTRYPOINT ["/bin/bash", "-c", "cd backend/migrations; diesel migration run; cd ../..; tail -f /dev/null"]

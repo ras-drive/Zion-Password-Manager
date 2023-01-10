@@ -1,7 +1,7 @@
 #!/bin/bash
 
-cd backend/migrations
+cd backend/migrations || exit
 diesel migration run
-cd ../..
+cd ../.. || exit
 
 make run

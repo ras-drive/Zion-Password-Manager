@@ -12,24 +12,25 @@ cleanup () {
 trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP INT QUIT PIPE TERM
 
 docker-compose -p ci build
-docker-compose -p ci up -d #--abort-on-container-exit
+docker-compose -p ci up -d
 
-# docker-compose -p ci exec test make test
-TEST_EXIT_CODE=`docker wait ci_test_1`
+TEST_EXIT_CODE=$(docker wait ci_test_1)
 
+# shellcheck disable=2181
 if [ $? -ne 0 ] ; then
-  printf "${RED}Docker Compose Failed${NC}\n"
-  exit -1
+  printf "%sDocker Compose Failed$%s\n" "$RED" "$NC"
+  exit 1
 fi
 
 if [ -z ${TEST_EXIT_CODE+x} ] || [ "$TEST_EXIT_CODE" -ne 0 ] ; then
   docker logs ci_database_1
   docker logs ci_test_1
-  printf "${RED}Tests Failed${NC} - Exit Code: $TEST_EXIT_CODE\n"
+  # printf "${RED}Tests Failed${NC} - Exit Code: $TEST_EXIT_CODE\n"
+  printf "%sTests Failed%s - Exit Code: $TEST_EXIT_CODE\n" "$RED" "$NC"
 else
-  printf "${GREEN}Tests Passed${NC}\n"
+  printf "%sTests Passed%s\n" "$GREEN" "$NC"
 fi
 
 cleanup
 
-exit $TEST_EXIT_CODE
+exit "$TEST_EXIT_CODE"
