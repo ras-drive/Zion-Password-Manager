@@ -43,7 +43,7 @@ you can also run the test suite after configuring and building by running
 make test
 ```
 
-## Runing in Docker
+## Running in Docker
 
 To run with docker first check that the docker service has been started
 
@@ -54,7 +54,13 @@ sudo systemctl start docker.service
 Then you can run it with Docker Compose
 
 ```shell
-docker-compose up
+./docker-compose-run.sh
+```
+
+if you want to run the test suite you can run
+
+```shell
+./docker-compose-test.sh
 ```
 
 ### License
