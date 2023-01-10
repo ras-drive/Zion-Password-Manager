@@ -11,7 +11,7 @@ cleanup () {
 
 trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP INT QUIT PIPE TERM
 
-# docker-compose -p zion build && \
+docker-compose -p zion build && \
     docker-compose -p zion up database server -d
 
 docker wait zion-server-1

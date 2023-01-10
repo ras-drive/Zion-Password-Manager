@@ -12,7 +12,8 @@ cleanup () {
 trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP INT QUIT PIPE TERM
 
 docker-compose build
-docker-compose up database test -d
+docker ps -a 
+docker-compose up database test&
 
 # docker-compose -p ci exec test make test
 TEST_EXIT_CODE=`docker wait zion-password-manager-test-1`
