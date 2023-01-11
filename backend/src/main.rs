@@ -1,7 +1,10 @@
 #[macro_use]
 extern crate dotenv_codegen;
 
-use crate::{database::establish_connection, utils::logging::init_telemetry};
+use crate::{
+    database::establish_connection,
+    utils::{logging::init_telemetry, migrations::run_migrations},
+};
 use actix_files::Files;
 use actix_identity::IdentityMiddleware;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
@@ -16,6 +19,15 @@ pub mod utils;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     init_telemetry();
+    
+    match run_migrations(&mut establish_connection().get().unwrap()) {
+        Ok(_) => {
+            log::info!("migrations successfully applied")
+        }
+        Err(e) => {
+            log::error!("migrations failed to apply\n\t{}", e)
+        }
+    };
 
     let secret_key = Key::generate();
 

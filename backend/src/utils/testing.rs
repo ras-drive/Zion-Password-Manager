@@ -6,7 +6,12 @@ macro_rules! test_app (
         use actix_identity::IdentityMiddleware;
         use actix_session::{SessionMiddleware, storage::CookieSessionStore};
         use cookie::Key;
-        use $crate::database;
+        use $crate::{database, run_migrations};
+
+        match run_migrations(&mut establish_connection().get().unwrap()) {
+            Ok(_) => { log::info!("migrations successfully applied") },
+            Err(e) => { log::error!("migrations failed to apply\n\t{}", e) },
+        };
 
         let secret_key = Key::generate();
 
