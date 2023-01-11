@@ -54,17 +54,6 @@ mod tests {
     #[actix_web::test]
     #[serial]
     async fn test_index_page() {
-        /*
-        let app = test::init_service(
-            App::new().wrap(TracingLogger::default()).service(
-                Files::new("/", "../frontend/dist")
-                    .prefer_utf8(true)
-                    .index_file("index.html"),
-            ),
-        )
-        .await;
-        */
-
         let app = test_app!();
 
         let req = test::TestRequest::get().uri("/").to_request();
