@@ -72,13 +72,11 @@ impl SessionCookie {
     }
 
     pub fn verify(&self, conn: &mut PgConnection) -> Result<(), ServiceError> {
-        let binding = session_cookies::table
+        let db_cookie = session_cookies::table
             .filter(user_email.eq(self.user_email.clone()))
             .load::<SessionCookie>(conn)
-            .expect("session cookie");
-        let db_cookie = binding.first().unwrap();
+            .expect("session cookie").first().unwrap().clone();
 
-        // self.cookie_id == db_cookie.cookie_id
         if self.cookie_id == db_cookie.cookie_id {
             Ok(())
         } else {
