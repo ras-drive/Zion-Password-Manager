@@ -75,7 +75,10 @@ impl SessionCookie {
         let db_cookie = session_cookies::table
             .filter(user_email.eq(self.user_email.clone()))
             .load::<SessionCookie>(conn)
-            .expect("session cookie").first().unwrap().clone();
+            .expect("session cookie")
+            .first()
+            .unwrap()
+            .clone();
 
         if self.cookie_id == db_cookie.cookie_id {
             Ok(())

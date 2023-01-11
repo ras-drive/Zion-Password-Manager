@@ -165,26 +165,18 @@ fn query(auth_data: AuthData, pool: web::Data<PgPool>) -> Result<LoggedUser, Ser
 
 #[cfg(test)]
 mod tests {
-    use crate::database::establish_connection;
+    use crate::{database::establish_connection, test_app};
 
     use super::*;
-    use actix_identity::IdentityMiddleware;
-    use actix_web::{test, App};
+    use actix_web::test;
     use serial_test::serial;
 
     #[actix_web::test]
     #[serial]
     async fn test_user_insert() {
-        let pool = establish_connection();
         let json: AuthData = User::default().into();
 
-        let app = test::init_service(
-            App::new()
-                .app_data(web::Data::new(pool.clone()))
-                .wrap(IdentityMiddleware::default())
-                .configure(configure),
-        )
-        .await;
+        let app = test_app!();
 
         let req = test::TestRequest::post()
             .uri("/api/user")
@@ -192,23 +184,15 @@ mod tests {
             .to_request();
         let resp = test::call_service(&app, req).await;
 
-        println!("{}", resp.status());
         assert!(resp.status().is_success())
     }
 
     #[actix_web::test]
     #[serial]
     async fn test_user_login() {
-        let pool = establish_connection();
         let json: AuthData = User::default().into();
 
-        let app = test::init_service(
-            App::new()
-                .app_data(web::Data::new(pool.clone()))
-                .wrap(IdentityMiddleware::default())
-                .configure(configure),
-        )
-        .await;
+        let app = test_app!();
 
         let req = test::TestRequest::post()
             .uri("/api/user")
