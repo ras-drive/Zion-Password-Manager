@@ -1,6 +1,6 @@
-![GitHub CI](https://github.com/ras-drive/Zion-Password-Manager/actions/workflows/rust.yml/badge.svg)
-
 # What is Zion?
+
+![GitHub CI](https://github.com/ras-drive/Zion-Password-Manager/actions/workflows/rust.yml/badge.svg)
 
 Zion is a password manager being developed to be a modern, cross platform, and secure with a
 backend written in Rust. currently the only frontend being developed for use is a webpage but
