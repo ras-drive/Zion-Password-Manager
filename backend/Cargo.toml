@@ -29,6 +29,7 @@ tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 tracing-log = "0.1"
 actix-service = "2.0.2"
+actix-governor = "0.3.2"
 
 [dependencies.cookie]
 version = "0.16"

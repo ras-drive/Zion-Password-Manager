@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    entrypoint: make test # docker_test
+    entrypoint: make test
     depends_on:
       database:
         condition: service_healthy
@@ -34,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    entrypoint: make run # docker_run
+    entrypoint: make run
     restart: always
     expose:
       - 8080

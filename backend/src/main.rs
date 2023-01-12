@@ -3,13 +3,13 @@ extern crate dotenv_codegen;
 
 use crate::{
     database::establish_connection,
-    utils::{logging::init_telemetry, migrations::run_migrations},
+    utils::{config::Config, logging::init_telemetry, migrations::run_migrations},
 };
 use actix_files::Files;
+use actix_governor::Governor;
 use actix_identity::IdentityMiddleware;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use actix_web::{web, App, HttpServer};
-use cookie::Key;
 use tracing_actix_web::TracingLogger;
 
 pub mod database;
@@ -19,7 +19,7 @@ pub mod utils;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     init_telemetry();
-    
+
     match run_migrations(&mut establish_connection().get().unwrap()) {
         Ok(_) => {
             log::info!("migrations successfully applied")
@@ -29,7 +29,7 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
-    let secret_key = Key::generate();
+    let config = Config::new();
 
     let pool = establish_connection();
     log::info!("database connection established");
@@ -40,11 +40,15 @@ async fn main() -> std::io::Result<()> {
             .wrap(TracingLogger::default())
             .wrap(IdentityMiddleware::default())
             .wrap(
-                SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
-                    .cookie_name("zion-login".to_string())
-                    .cookie_secure(false)
-                    .build(),
+                SessionMiddleware::builder(
+                    CookieSessionStore::default(),
+                    config.secret_key.clone(),
+                )
+                .cookie_name("zion-login".to_string())
+                .cookie_secure(false)
+                .build(),
             )
+            .wrap(Governor::new(&config.rate_limiter_config))
             .configure(database::routes::user::configure)
             .service(
                 Files::new("/", "../frontend/dist")

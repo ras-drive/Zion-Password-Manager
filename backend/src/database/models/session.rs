@@ -1,5 +1,5 @@
 use crate::schema::session_cookies::user_email;
-use crate::{database::routes::ServiceError, schema::session_cookies};
+use crate::{database::routes::errors::ServiceError, schema::session_cookies};
 use actix_identity::Identity;
 use diesel::delete;
 use diesel::{insert_into, prelude::*};

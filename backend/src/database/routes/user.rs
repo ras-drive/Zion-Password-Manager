@@ -2,7 +2,7 @@ use crate::{
     database::{
         models::{session::SessionCookie, user::User},
         pg_pool_handler,
-        routes::ServiceError,
+        routes::errors::ServiceError,
         PgPool,
     },
     schema::users::dsl::*,
