@@ -1,10 +1,13 @@
-use actix_governor::{GovernorConfig, GovernorConfigBuilder, PeerIpKeyExtractor};
+use actix_governor::{
+    governor::{clock::QuantaInstant, middleware::NoOpMiddleware},
+    GovernorConfig, GovernorConfigBuilder, PeerIpKeyExtractor,
+};
 use cookie::Key;
 
 #[derive(Clone)]
 pub struct Config {
     pub secret_key: Key,
-    pub rate_limiter_config: GovernorConfig<PeerIpKeyExtractor>,
+    pub rate_limiter_config: GovernorConfig<PeerIpKeyExtractor, NoOpMiddleware<QuantaInstant>>,
 }
 
 impl Config {
@@ -13,7 +16,6 @@ impl Config {
         let rate_limiter_config = GovernorConfigBuilder::default()
             .per_second(2)
             .burst_size(5)
-            .use_headers()
             .finish()
             .unwrap();
 
