@@ -10,8 +10,6 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | b
 
 RUN ["/bin/bash", "-c", "source ~/.nvm/nvm.sh; nvm install 16; nvm alias default 16"]
 
-RUN ["/bin/bash", "-c", "cargo install diesel_cli --no-default-features --features postgres"]
-
 WORKDIR /usr/src/app
 
 COPY . .
