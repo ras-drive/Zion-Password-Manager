@@ -4,7 +4,7 @@
 ![Total Lines](https://img.shields.io/tokei/lines/github/ras-drive/Zion-Password-Manager)
 ![Closed Issues](https://img.shields.io/github/issues-pr-closed-raw/ras-drive/Zion-Password-Manager)
 
-Zion is a password manager being developed to be a modern, cross platform, and secure with a
+Zion is a password manager being developed to be modern, cross platform, and secure with a
 backend written in Rust. currently the only frontend being developed for use is a webpage but
 eventually an android version will be released when the backend is stable.
 
@@ -13,19 +13,18 @@ eventually an android version will be released when the backend is stable.
 First things first, if you aren't using Docker you need to setup a postgresql database
 
 Any of the links below explain how to setup a postgresql database so
-pick your distributions (if yours isn't listed I prefer the Arch Docs)
+pick your distribution (if yours isn't listed I prefer the Arch Docs)
 
 * [Debian](https://wiki.debian.org/PostgreSql)
 * [Fedora](https://docs.fedoraproject.org/en-US/quick-docs/postgresql/)
 * [Arch](https://wiki.archlinux.org/title/PostgreSQL)
 
-You need to make sure you have a [Rust](https://www.rust-lang.org/learn/get-started) toolchain installed.
+You need to make sure you have a [Rust toolchain](https://www.rust-lang.org/learn/get-started) installed
 
-You also need to make sure you are using node 16, NVM (Node Version Manager) is the easiest way to do this.
+You also need to make sure you are using node 16, [NVM](https://github.com/nvm-sh/nvm)
+(Node Version Manager) is the easiest way to do this.
 
-[NVM](https://github.com/nvm-sh/nvm)
-
-then you can just run
+install it and then run
 
 ```shell
 nvm alias default 16
