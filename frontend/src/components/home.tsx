@@ -19,11 +19,11 @@ export class Home extends React.Component{
                         <ul>
                             <li><p><a href='https://actix.rs/'>Actix</a>:
                                 Actix is a powerful and extremely fast web framework for Rust that has very much support behind it</p><br></br></li>
-                            <li><p><a href='https://vitejs.dev/'>Vite</a>:
-                                A very easy to setup frontend framework that we are using with React in order to build our web pages</p><br></br></li>
                             <li><p><a href='https://www.diesel.rs/'>Diesel</a>:
                                 Diesel is a high level Rust ORM that helps us to run and load PostgreSQL queries over abstractions,
                                 allowing us to write effective queries against a relational database in Rust easily and safely</p><br></br></li>
+                            <li><p><a href='https://vitejs.dev/'>Vite</a>:
+                                A very easy to setup frontend framework that we are using with React in order to build our web pages</p><br></br></li>
                         </ul>
                         <br></br>
                     </div>

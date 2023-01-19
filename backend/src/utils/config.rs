@@ -18,7 +18,7 @@ impl Config {
         let secret_key = Key::generate();
         let rate_limiter_config = GovernorConfigBuilder::default()
             .per_second(2)
-            .burst_size(5)
+            .burst_size(25)
             .finish()
             .unwrap();
 
