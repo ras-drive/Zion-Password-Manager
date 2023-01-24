@@ -1,6 +1,6 @@
-import { useForm } from 'react-hook-form';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useForm } from 'react-hook-form'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import bgImg from '../../assets/logo.svg'
 
 type FormJson = {
@@ -9,22 +9,22 @@ type FormJson = {
 };
 
 export default function Form() {
-    const { register, handleSubmit, watch, formState: { errors } } = useForm()
+    const { register, handleSubmit } = useForm()
 
     const onSubmit = (data: any) => {
         let json = data as FormJson;
 
         const url = '/api/login/user';
         const options = {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json;charset=UTF-8'
-        },
-        body: JSON.stringify({
-            email: json.email,
-            password: json.password
-        })
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify({
+                email: json.email,
+                password: json.password
+            })
         };
 
         fetch(url, options)
@@ -33,9 +33,11 @@ export default function Form() {
                 toast('successfully logged in!')
             } else if (response.status == 401) {
                 toast('invalid email or password')
+            } else {
+                toast('an error has occurred while logging in')
             }
         });
-        };
+    };
 
     return (
         <section>
