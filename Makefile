@@ -6,9 +6,19 @@ build:
 	cp public/* dist/assets/; cd ..; \
 	cd backend; cargo build
 
+build-production:
+	cd frontend; npm run production-build; \
+	cp public/* dist/assets/; cd ..; \
+	cd backend; cargo build --release
+
 run:
 	cd backend; \
 	RUST_LOG=debug cargo run
+
+run-production:
+	make build-production; \
+	cd backend; \
+	RUST_LOG=info cargo run --release
 
 dev:
 	make build; RUST_LOG=debug make run

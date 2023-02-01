@@ -33,7 +33,10 @@ async fn main() -> std::io::Result<()> {
 
     let pool = establish_connection();
     log::info!("database connection established");
-    log::info!("starting HTTP server at http://{}:8080", config.addr.as_str());
+    log::info!(
+        "starting HTTP server at http://{}:8080",
+        config.addr.as_str()
+    );
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))

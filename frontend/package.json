@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build --mode development",
+    "production-build": "tsc && vite build --mode production",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "eslint --max-warnings=0"

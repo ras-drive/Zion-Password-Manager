@@ -34,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    entrypoint: make run
+    entrypoint: make run-production
     restart: always
     expose:
       - 8080
