@@ -2,7 +2,8 @@ use actix_governor::{
     governor::{clock::QuantaInstant, middleware::NoOpMiddleware},
     GovernorConfig, GovernorConfigBuilder, PeerIpKeyExtractor,
 };
-use cookie::Key;
+
+use actix_web::cookie::Key;
 
 #[derive(Clone)]
 pub struct Config {

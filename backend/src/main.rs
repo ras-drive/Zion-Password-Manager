@@ -40,7 +40,7 @@ async fn main() -> std::io::Result<()> {
         config.addr.as_str()
     );
 
-    let build_mode = env::var("BUILD_MODE").unwrap_or("development".into());
+    let build_mode = env::var("BUILD_MODE").unwrap_or_else(|_| "development".into());
     log::info!("Running in {} mode", build_mode);
 
     HttpServer::new(move || {
