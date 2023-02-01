@@ -18,7 +18,7 @@ run:
 run-production:
 	make build-production; \
 	cd backend; \
-	RUST_LOG=info cargo run --release
+	RUST_LOG=info BUILD_MODE=production cargo run --release
 
 dev:
 	make build; RUST_LOG=debug make run

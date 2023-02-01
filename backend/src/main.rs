@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate dotenv_codegen;
 
+use std::env;
+
 use crate::{
     database::establish_connection,
     utils::{config::Config, logging::init_telemetry, migrations::run_migrations},
@@ -37,6 +39,10 @@ async fn main() -> std::io::Result<()> {
         "starting HTTP server at http://{}:8080",
         config.addr.as_str()
     );
+
+    let build_mode = env::var("BUILD_MODE").unwrap_or("development".into());
+    log::info!("Running in {} mode", build_mode);
+
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))

@@ -66,6 +66,17 @@ if you want to run the test suite you can run
 ./docker-compose-test.sh
 ```
 
+## Config
+
+The provided config script installs NPM dependencies and performs database migrations.
+the .env file produced by it can also be modified to have the following variables
+
+|      Variable     |          Description           |
+|-------------------|--------------------------------|
+|   DATABASE_URL    |    Postgresql  database url    |
+| Test_DATABASE_URL |  Postgresql test database url  |
+|       ADDR        | Ipv4 Address to run server on  |
+
 ### License
 
 This project is dual licensed under the MIT and Apache 2.0 license
